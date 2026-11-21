@@ -36,8 +36,28 @@ for path in / /connexion /mot-de-passe-oublie /reset-password; do
     echo "::error::$path: marqueur de clé serveur détecté"
     exit 1
   fi
+  # A preview deployment can finish after the GitHub push workflow starts.
+  # Retry the same read-only URL while Cloudflare propagates the new preview.
   if ! grep -Fq "$project" "$tmp/$label.html"; then
-    echo "::error::$path: URL du nouveau Supabase absente du rendu serveur"
+    ready=false
+    for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+      sleep 10
+      code="$(curl --fail-with-body --retry 2 --retry-all-errors --retry-delay 2 \\
+        --connect-timeout 10 --max-time 25 --silent --show-error \\
+        --output "$tmp/$label.html" --write-out '%{http_code}' "$base$path")"
+      if [[ "$code" == "200" ]] && grep -Fq "$project" "$tmp/$label.html"; then
+        ready=true
+        break
+      fi
+    done
+    if [[ "$ready" != true ]]; then
+      echo "::error::$path: URL du nouveau Supabase absente du rendu serveur après 120 s"
+      exit 1
+    fi
+  fi
+  # Recheck after retries: no old staging or privileged key may leak.
+  if grep -q "$old_project\\|SUPABASE_SERVICE_ROLE_KEY\\|sb_secret_" "$tmp/$label.html"; then
+    echo "::error::$path: ancienne base ou marqueur de clé serveur détecté après propagation"
     exit 1
   fi
   echo "$path: HTTP 200, base de production attendue, aucun secret visible."

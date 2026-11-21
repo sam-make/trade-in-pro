@@ -64,3 +64,15 @@ Analyse de code SQL vérifiée : `owner_analytics` et `super_admin_mutate` appel
 **Actions sûres proposées :** inventorier les références de chaque fonction dans les politiques RLS, les triggers et le frontend ; identifier les RPC publiques nécessaires ; tester `anon`, deux boutiques et le super-admin avec des identités de test ; ensuite préparer une migration datée limitant uniquement les `EXECUTE` inutiles, revue par sécurité et QA. Ne pas appliquer de REVOKE à la base actuelle sans validation.
 
 **État GO/NO-GO : sécurité = PARTIEL / NO-GO.** Le succès des tests CI prouve la compilation et les contrôles statiques, pas la sécurité d'une connexion réelle. Le test Auth historique, le navigateur mobile, le delta Lovable final et la validation explicite restent obligatoires.
+
+## Actualisation GO/NO-GO — 21 novembre 2026
+| Critère | État | Preuve / réserve |
+| --- | --- | --- |
+| CI qualité et contrôles statiques | PASSÉ au commit d8d28f0c ; nouveau correctif en attente | [CI 44822489125](https://github.com/sam-make/trade-in-pro/actions/runs/44822489125) |
+| Smoke HTTP de l'aperçu après nouveau build | ÉCHEC / À REVALIDER | [Run 44822475869](https://github.com/sam-make/trade-in-pro/actions/runs/44822475869) ; déploiement Preview constaté après lancement du contrôle ; temporisation ajoutée dans le script |
+| Comptes et tables sur Supabase cible | PARTIEL | SELECT lecture seule : 17 comptes, 17 identités, 24 tables ; aucun login réel testé |
+| Sécurité RLS et fonctions privilégiées | NO-GO | Advisor : 3 INFO RLS sans politique, 10 WARN anon, 10 WARN authenticated, 1 WARN protection mot de passe ; revue nécessaire avant toute migration |
+| Synchronisation Lovable, Auth historique, métier et mobile | NON VÉRIFIÉ | Aucune comparaison finale ou authentification réelle lors de cette exécution |
+| Déploiement public Cloudflare | INTERDIT | Approbation explicite non obtenue ; PR #1 reste en brouillon |
+
+La temporisation du smoke HTTP corrige une condition de concurrence possible ; elle **ne constitue pas une validation du rendu courant**. Aucun secret, compte, production Lovable ou base métier modifié.

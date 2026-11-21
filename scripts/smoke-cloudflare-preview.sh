@@ -42,8 +42,8 @@ for path in / /connexion /mot-de-passe-oublie /reset-password; do
     ready=false
     for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
       sleep 10
-      code="$(curl --fail-with-body --retry 2 --retry-all-errors --retry-delay 2 \\
-        --connect-timeout 10 --max-time 25 --silent --show-error \\
+      code="$(curl --fail-with-body --retry 2 --retry-all-errors --retry-delay 2 \
+        --connect-timeout 10 --max-time 25 --silent --show-error \
         --output "$tmp/$label.html" --write-out '%{http_code}' "$base$path")"
       if [[ "$code" == "200" ]] && grep -Fq "$project" "$tmp/$label.html"; then
         ready=true

@@ -45,6 +45,7 @@ export async function ensureWorkspaceFor(
   userId: string,
   userEmail: string | null,
   metadata: Record<string, unknown>,
+  options: { allowProvisioning?: boolean } = {},
 ): Promise<WorkspaceSnapshot> {
   const { data: existing, error: existingError } = await admin
     .from("profiles")
@@ -56,6 +57,13 @@ export async function ensureWorkspaceFor(
   let shopId = existing?.shop_id as string | undefined;
 
   if (!shopId) {
+    // A user-scoped, RLS-enforced client can read an existing workspace but
+    // must never create shops, profiles, roles or default rules.
+    if (options.allowProvisioning === false) {
+      throw new Error(
+        "Aucun espace boutique existant n'est associé à ce compte. Création temporairement indisponible.",
+      );
+    }
     const shopName = (metadata.shop_name as string) || "Ma boutique";
     const { data: shop, error: shopError } = await admin
       .from("shops")

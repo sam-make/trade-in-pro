@@ -95,6 +95,54 @@ describe("ensureWorkspaceFor — métadonnées utilisateur jamais dignes de conf
     expect(result.role).toBe("admin");
   });
 
+  it("autorise la lecture RLS d'une boutique existante sans clé administrateur", async () => {
+    const { client, calls } = mockClient({
+      profiles: {
+        maybeSingle: ok({ id: "user-2", shop_id: "shop-A" }),
+        single: ok({ id: "user-2", full_name: "Employé", email: "e@x.fr" }),
+      },
+      shops: { single: ok({ ...SHOP, id: "shop-A", name: "Boutique A" }) },
+      user_roles: { maybeSingle: ok({ role: "employee" }) },
+    });
+
+    const result = await ensureWorkspaceFor(
+      client,
+      "user-2",
+      "e@x.fr",
+      { shop_name: "Boutique falsifiée", invited_role: "admin" },
+      { allowProvisioning: false },
+    );
+
+    expect(result.shop.id).toBe("shop-A");
+    expect(result.role).toBe("employee");
+    expect(calls).toEqual([]);
+  });
+
+  it("ne provisionne jamais de boutique sans clé administrateur", async () => {
+    const { client, calls } = mockClient({ profiles: { maybeSingle: ok(null) } });
+
+    await expect(
+      ensureWorkspaceFor(
+        client,
+        "user-new",
+        "new@x.fr",
+        { shop_name: "Boutique falsifiée", invited_role: "admin" },
+        { allowProvisioning: false },
+      ),
+    ).rejects.toThrow("Création temporairement indisponible");
+    expect(calls).toEqual([]);
+  });
+
+  it("ne provisionne pas un profil orphelin sans clé administrateur", async () => {
+    const { client, calls } = mockClient({
+      profiles: { maybeSingle: ok({ id: "user-3", shop_id: null }) },
+    });
+    await expect(
+      ensureWorkspaceFor(client, "user-3", null, {}, { allowProvisioning: false }),
+    ).rejects.toThrow("Création temporairement indisponible");
+    expect(calls).toEqual([]);
+  });
+
   it("réutilise le profil/rôle pré-écrit côté serveur par inviteMember", async () => {
     const { client, calls } = mockClient({
       profiles: {

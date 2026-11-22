@@ -31,7 +31,7 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState<"checking" | "ready" | "invalid">("checking");
+  const [status, setStatus] = useState<"checking" | "ready" | "invalid" | "unavailable">("checking");
 
   // The recovery link can arrive as ?code=..., ?token_hash=...&type=recovery,
   // or as an implicit #access_token=... fragment. Establish the recovery
@@ -40,7 +40,8 @@ function ResetPasswordPage() {
     let cancelled = false;
 
     async function establishSession() {
-      const url = new URL(window.location.href);
+      try {
+        const url = new URL(window.location.href);
       const code = url.searchParams.get("code");
       const tokenHash = url.searchParams.get("token_hash");
       const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
@@ -57,8 +58,12 @@ function ResetPasswordPage() {
       }
 
       const { data } = await supabase.auth.getSession();
-      if (cancelled) return;
-      setStatus(data.session ? "ready" : "invalid");
+        if (cancelled) return;
+        setStatus(data.session ? "ready" : "invalid");
+      } catch {
+        // Unexpected Auth/network failures must not leave the page loading forever.
+        if (!cancelled) setStatus("unavailable");
+      }
     }
 
     void establishSession();
@@ -78,19 +83,24 @@ function ResetPasswordPage() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.auth.updateUser({ password });
-    setSubmitting(false);
-    if (error) {
-      const message = error.message.toLowerCase();
-      if (message.includes("weak") || message.includes("pwned")) {
-        toast.error("Ce mot de passe figure dans des fuites connues. Choisissez-en un autre.");
-      } else {
-        toast.error(error.message);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        const message = error.message.toLowerCase();
+        if (message.includes("weak") || message.includes("pwned")) {
+          toast.error("Ce mot de passe figure dans des fuites connues. Choisissez-en un autre.");
+        } else {
+          toast.error(error.message);
+        }
+        return;
       }
-      return;
+      toast.success("Mot de passe mis à jour.");
+      navigate({ to: "/tableau-de-bord", replace: true });
+    } catch {
+      toast.error("Impossible de mettre à jour le mot de passe. Réessayez.");
+    } finally {
+      setSubmitting(false);
     }
-    toast.success("Mot de passe mis à jour.");
-    navigate({ to: "/tableau-de-bord", replace: true });
   }
 
   return (
@@ -99,6 +109,15 @@ function ResetPasswordPage() {
         <p className="rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">
           Vérification du lien de réinitialisation…
         </p>
+      ) : status === "unavailable" ? (
+        <div className="space-y-3">
+          <p className="rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">
+            Impossible de vérifier le lien pour le moment. Vérifiez votre connexion et réessayez.
+          </p>
+          <Button className="w-full" size="lg" onClick={() => window.location.reload()}>
+            Réessayer
+          </Button>
+        </div>
       ) : status === "invalid" ? (
         <div className="space-y-3">
           <p className="rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">

@@ -24,7 +24,7 @@ trap cleanup EXIT
 
 # Generate a temporary Wrangler config alongside wrangler.jsonc so relative
 # paths resolve correctly. The generated file is deleted, never committed.
-node - "$preview_config" <<'NODE'
+node - "$preview_config" "${1:-}" <<'NODE'
 const fs = require("node:fs");
 const filename = process.argv[2];
 const config = JSON.parse(fs.readFileSync("wrangler.jsonc", "utf8"));
@@ -53,7 +53,7 @@ if (fs.existsSync(generatedPath)) {
   }
   generated.previews = { ...(generated.previews || {}), vars };
   fs.writeFileSync(generatedPath, JSON.stringify(generated, null, 2), { mode: 0o600 });
-} else if (process.env.CLOUDFLARE_BUILD === "1") {
+} else if (process.argv[3] !== "--verify-only") {
   throw new Error("Compiled Wrangler configuration is missing");
 }
 NODE

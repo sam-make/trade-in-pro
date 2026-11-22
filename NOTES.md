@@ -218,3 +218,19 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Supabase autonome `xuvaihwygkcwriqfnkbg` : **17 comptes, 17 identités, 24 tables publiques** constatés par SELECT lecture seule. Cela ne démontre ni le fonctionnement des mots de passe, ni la parité actuelle avec Lovable.
 - Security Advisor du 21/11 : **3 tables RLS sans politique (INFO)**, **10 fonctions SECURITY DEFINER accessibles à anon (WARN)**, **10 accessibles à authenticated (WARN)** et **protection des mots de passe compromis désactivée (WARN)**. Aucune révocation automatique : dépendances et tests multi-boutiques requis.
 - **GO/NO-GO : NO-GO maintenu**. Attendre la nouvelle CI sur le correctif, contrôler le rendu externe, tester Auth avec identités autorisées, RLS multi-boutiques, parcours métier et delta Lovable final. Ne pas confondre déploiement Preview et production publique.
+
+
+## Vérification autonome — 22 novembre 2026 (lecture seule)
+- Base cible `xuvaihwygkcwriqfnkbg` : **24 tables publiques, RLS activée sur 24/24** (requête de catalogue PostgreSQL en lecture seule). Cela ne prouve PAS l'étanchéité multi-boutiques : les tests JWT de deux boutiques restent P0.
+- Cloudflare : Worker `trade-in-pro` lié au bon projet par `SUPABASE_URL`, clé publique présente, route publique désactivée et aperçus autorisés. **La clé serveur `SUPABASE_SERVICE_ROLE_KEY` est absente des bindings de ce Worker** : les RPC serveur nécessitant des privilèges restent non validées.
+- Workers Builds : dépôt `sam-make/trade-in-pro` et branche d'aperçu `migration-cloudflare` liés. Aucun déploiement public effectué.
+- [GitHub Actions 44918682188](https://github.com/sam-make/trade-in-pro/actions/runs/44918682188) : **ÉCHEC** du smoke HTTP après 120 s ; l'URL du nouveau Supabase n'apparaît pas dans le HTML SSR de `/`. Le délai de propagation seul ne suffit donc pas à expliquer ou résoudre le défaut. D'autres jobs du même commit ont réussi ; la validation de bout en bout reste **NO-GO**.
+- Diagnostic à poursuivre sans données personnelles : contrôler les variables **runtime de l'aperçu exact** (distinctes des bindings du Worker de base), sa version active et le chemin d'injection HTML de `public-config.ts`. Ne pas publier de clé privée, ne pas ouvrir le Worker public, ne pas modifier Lovable.
+
+### GO/NO-GO au 22/11
+- **Qualité CI** : PARTIEL (jobs verts mais smoke HTTP rouge).
+- **Authentification réelle** : NON VÉRIFIÉE.
+- **RLS activée** : PASSÉ (24/24) ; **isolation entre boutiques** : NON VÉRIFIÉE.
+- **Synchronisation finale Lovable → Supabase** : NON VÉRIFIÉE, aucun gel des écritures.
+- **Parcours métier et mobile** : NON VÉRIFIÉS.
+- **Production Cloudflare** : **NO-GO** ; PR #1 non fusionnée.

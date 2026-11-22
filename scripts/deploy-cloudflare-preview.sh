@@ -72,6 +72,14 @@ if (vars.SUPABASE_PUBLISHABLE_KEY !== process.env.VITE_SUPABASE_PUBLISHABLE_KEY)
 if ("SUPABASE_SERVICE_ROLE_KEY" in vars) {
   throw new Error("Service role value present in Preview plaintext vars");
 }
+const generatedPath = "dist/server/wrangler.json";
+if (fs.existsSync(generatedPath)) {
+  const generated = JSON.parse(fs.readFileSync(generatedPath, "utf8"));
+  if (generated.previews?.vars?.SUPABASE_URL !== vars.SUPABASE_URL ||
+      generated.previews?.vars?.SUPABASE_PUBLISHABLE_KEY !== vars.SUPABASE_PUBLISHABLE_KEY) {
+    throw new Error("Vite redirected deploy config is missing Preview bindings");
+  }
+}
 console.log("Configuration Preview validée sans afficher les variables.");
 NODE
 else

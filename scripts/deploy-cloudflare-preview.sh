@@ -83,5 +83,8 @@ if (fs.existsSync(generatedPath)) {
 console.log("Configuration Preview validée sans afficher les variables.");
 NODE
 else
-  bunx wrangler preview --config "$preview_config"
+  # The Vite plugin redirects Wrangler to dist/server/wrangler.json through
+  # .wrangler/deploy/config.json. Supplying --config bypasses that redirect
+  # and makes Wrangler look for a nonexistent source entry-point.
+  bunx wrangler preview
 fi

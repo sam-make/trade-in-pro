@@ -19,6 +19,8 @@ dist-ssr
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars*
+# Temporary config generated only on the Cloudflare build runner
+.wrangler-preview.*.json
 
 # Editor directories and files
 .vscode/*

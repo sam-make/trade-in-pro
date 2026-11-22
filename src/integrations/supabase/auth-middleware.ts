@@ -99,6 +99,8 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
         supabase,
         userId: data.claims.sub,
         claims: data.claims,
+        // Remains server-side; required for a fresh Auth user verification.
+        accessToken: token,
       },
     });
   },

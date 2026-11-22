@@ -20,11 +20,16 @@ export const ensureWorkspace = createServerFn({ method: "POST" })
     const { ensureWorkspaceFor } = await import("./workspace.server");
     const claims = context.claims as Record<string, unknown>;
     const metadata = (claims.user_metadata as Record<string, unknown>) ?? {};
+    // Previews can read already-provisioned workspaces using the caller's
+    // JWT and existing tenant RLS policies without a service-role secret.
+    // Never use that user-scoped client to provision shops or assign roles.
+    const hasAdminKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
     return ensureWorkspaceFor(
-      supabaseAdmin,
+      hasAdminKey ? supabaseAdmin : context.supabase,
       context.userId,
       (claims.email as string) ?? null,
       metadata,
+      { allowProvisioning: hasAdminKey },
     );
   });
 

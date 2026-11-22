@@ -7,7 +7,7 @@ export const getOwnerAnalytics = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => analyticsInput.parse(input))
   .handler(async ({ data, context }) => {
     const { requireOwner } = await import("./super-admin.server");
-    await requireOwner(context.supabase);
+    await requireOwner(context.supabase, context.accessToken);
     const result = await context.supabase.rpc("owner_analytics", {
       _days: data.days,
       ...(data.shopId ? { _shop: data.shopId } : {}),

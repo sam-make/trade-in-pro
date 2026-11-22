@@ -31,7 +31,9 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState<"checking" | "ready" | "invalid" | "unavailable">("checking");
+  const [status, setStatus] = useState<"checking" | "ready" | "invalid" | "unavailable">(
+    "checking",
+  );
 
   // The recovery link can arrive as ?code=..., ?token_hash=...&type=recovery,
   // or as an implicit #access_token=... fragment. Establish the recovery
@@ -42,22 +44,22 @@ function ResetPasswordPage() {
     async function establishSession() {
       try {
         const url = new URL(window.location.href);
-      const code = url.searchParams.get("code");
-      const tokenHash = url.searchParams.get("token_hash");
-      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const code = url.searchParams.get("code");
+        const tokenHash = url.searchParams.get("token_hash");
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
 
-      if (code) {
-        await supabase.auth.exchangeCodeForSession(code);
-      } else if (tokenHash) {
-        await supabase.auth.verifyOtp({ type: "recovery", token_hash: tokenHash });
-      } else if (hash.get("access_token") && hash.get("refresh_token")) {
-        await supabase.auth.setSession({
-          access_token: hash.get("access_token")!,
-          refresh_token: hash.get("refresh_token")!,
-        });
-      }
+        if (code) {
+          await supabase.auth.exchangeCodeForSession(code);
+        } else if (tokenHash) {
+          await supabase.auth.verifyOtp({ type: "recovery", token_hash: tokenHash });
+        } else if (hash.get("access_token") && hash.get("refresh_token")) {
+          await supabase.auth.setSession({
+            access_token: hash.get("access_token")!,
+            refresh_token: hash.get("refresh_token")!,
+          });
+        }
 
-      const { data } = await supabase.auth.getSession();
+        const { data } = await supabase.auth.getSession();
         if (cancelled) return;
         setStatus(data.session ? "ready" : "invalid");
       } catch {

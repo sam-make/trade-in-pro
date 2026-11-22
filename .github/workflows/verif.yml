@@ -16,6 +16,17 @@ jobs:
       - name: Installer les paquets sans scripts tiers
         id: install
         run: bun install --frozen-lockfile --ignore-scripts
+      - name: Valider sans déploiement la configuration Preview générée
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          VITE_SUPABASE_URL: https://xuvaihwygkcwriqfnkbg.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_dummy_only
+        run: |
+          bash scripts/deploy-cloudflare-preview.sh --verify-only
+          if find . -maxdepth 1 -name '.wrangler-preview.*.json' | grep -q .; then
+            echo "::error::Un fichier de configuration temporaire persiste."
+            exit 1
+          fi
       - name: Vérifier les types TypeScript
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bunx tsc --noEmit

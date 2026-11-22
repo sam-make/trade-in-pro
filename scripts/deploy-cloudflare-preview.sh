@@ -41,6 +41,21 @@ if ("SUPABASE_SERVICE_ROLE_KEY" in vars) {
 }
 config.previews = { ...(config.previews || {}), vars };
 fs.writeFileSync(filename, JSON.stringify(config, null, 2), { mode: 0o600 });
+
+// The Cloudflare Vite plugin redirects Wrangler to its GENERATED deployment
+// config (dist/server/wrangler.json). Editing the source config alone is not
+// sufficient: the redirected file must carry the Preview bindings as well.
+const generatedPath = "dist/server/wrangler.json";
+if (fs.existsSync(generatedPath)) {
+  const generated = JSON.parse(fs.readFileSync(generatedPath, "utf8"));
+  if (generated.name !== config.name) {
+    throw new Error("Redirected Cloudflare Worker name mismatch");
+  }
+  generated.previews = { ...(generated.previews || {}), vars };
+  fs.writeFileSync(generatedPath, JSON.stringify(generated, null, 2), { mode: 0o600 });
+} else if (process.env.CLOUDFLARE_BUILD === "1") {
+  throw new Error("Compiled Wrangler configuration is missing");
+}
 NODE
 
 if [[ "${1:-}" == "--verify-only" ]]; then

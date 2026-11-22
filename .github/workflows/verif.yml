@@ -47,6 +47,12 @@ jobs:
       - name: Compiler l'application
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run build
+      - name: Contrôler les bindings de la configuration Vite compilée
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          VITE_SUPABASE_URL: https://xuvaihwygkcwriqfnkbg.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_dummy_only
+        run: bash scripts/deploy-cloudflare-preview.sh --verify-only
       - name: Bloquer toute référence à la clé serveur dans le bundle navigateur
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |

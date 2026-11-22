@@ -60,6 +60,38 @@ for path in / /connexion /mot-de-passe-oublie /reset-password; do
     echo "::error::$path: ancienne base ou marqueur de clé serveur détecté après propagation"
     exit 1
   fi
+  # Valider les balises HTML réellement utilisées par le client Supabase.
+  # Une URL dans un autre endroit du HTML ne prouve pas que la connexion
+  # du navigateur est configurée ; ne jamais afficher la clé publique.
+  if ! python3 - "$tmp/$label.html" "$project" <<'PY'
+from html.parser import HTMLParser
+from pathlib import Path
+import sys
+
+class PublicConfigMetaParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.meta = {}
+
+    def handle_starttag(self, tag, attrs):
+        if tag != "meta":
+            return
+        attributes = dict(attrs)
+        name = attributes.get("name", "")
+        if name.startswith("trade-in-supabase-"):
+            self.meta[name] = attributes.get("content", "")
+
+parser = PublicConfigMetaParser()
+parser.feed(Path(sys.argv[1]).read_text(encoding="utf-8"))
+valid_url = parser.meta.get("trade-in-supabase-url") == sys.argv[2]
+public_key = parser.meta.get("trade-in-supabase-publishable-key", "")
+if not valid_url or not public_key.startswith("sb_publishable_"):
+    raise SystemExit(1)
+PY
+  then
+    echo "::error::$path: balises Supabase absentes ou incorrectes dans le HTML SSR"
+    exit 1
+  fi
   echo "$path: HTTP 200, base de production attendue, aucun secret visible."
 done
 

@@ -9,7 +9,7 @@ export const ownerAccess = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { requireOwner } = await import("./super-admin.server");
     try {
-      await requireOwner(context.supabase);
+      await requireOwner(context.supabase, context.accessToken);
       return true;
     } catch {
       return false;
@@ -38,7 +38,7 @@ export const listGlobalData = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => listSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { requireOwner } = await import("./super-admin.server");
-    await requireOwner(context.supabase);
+    await requireOwner(context.supabase, context.accessToken);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const projections = {
       shops: "id,name,address,phone,email,suspended_at,archived_at,created_at",
@@ -105,7 +105,7 @@ export const globalOverview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { requireOwner } = await import("./super-admin.server");
-    await requireOwner(context.supabase);
+    await requireOwner(context.supabase, context.accessToken);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const counts = await Promise.all(
       (["shops", "profiles", "repairs", "estimations"] as const).map(async (table) => {
@@ -141,7 +141,7 @@ export const updateGlobalEntity = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { requireOwner } = await import("./super-admin.server");
-    await requireOwner(context.supabase);
+    await requireOwner(context.supabase, context.accessToken);
     if (
       data.kind === "member" &&
       Object.keys(data.changes).some((key) => !["role", "suspended"].includes(key))

@@ -29,6 +29,13 @@ describe("global owner authorization", () => {
     expect(await requireOwner(c.value)).toBe("owner-id");
     expect(c.rpc).toHaveBeenCalledWith("is_super_admin");
   });
+  it("vérifie le propriétaire avec le jeton transmis par le middleware serveur", async () => {
+    const c = client("haddaouisamy86@gmail.com", "2026-08-16", true);
+    const getUser = vi.spyOn(c.value.auth, "getUser");
+    expect(await requireOwner(c.value, "verified-bearer-token")).toBe("owner-id");
+    expect(getUser).toHaveBeenCalledWith("verified-bearer-token");
+    expect(c.rpc).toHaveBeenCalledWith("is_super_admin");
+  });
   it("rejects a different email despite forged metadata and a role", async () => {
     const c = client("shop@example.com", "2026-08-16", true);
     await expect(requireOwner(c.value)).rejects.toThrow("réservé");

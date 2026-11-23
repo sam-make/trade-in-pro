@@ -1,8 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-export async function requireOwner(client: SupabaseClient<Database>) {
-  const { data, error } = await client.auth.getUser();
+export async function requireOwner(client: SupabaseClient<Database>, accessToken?: string) {
+  // The user-scoped server client deliberately has no persisted session.
+  // Pass the verified bearer token to GoTrue instead of relying on storage.
+  const { data, error } = await client.auth.getUser(accessToken);
   if (
     error ||
     !data.user ||

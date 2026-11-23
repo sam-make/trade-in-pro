@@ -1,0 +1,39 @@
+name: Vérifier l'aperçu Cloudflare connecté à Supabase
+on:
+  push:
+    branches: [migration-cloudflare]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke-preview:
+    name: HTTP SSR, nouvelle base et Auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attendre la propagation de la préproduction, puis tester les URLs sans identifiants
+        run: bash scripts/smoke-cloudflare-preview.sh
+      - name: Installer Node et un moteur Playwright sans télécharger de navigateur
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Installer Playwright Core pour utiliser Chrome déjà présent sur le runner
+        run: npm install --no-save --ignore-scripts --prefix /tmp/trade-in-playwright playwright-core@1.56.1
+      - name: Contrôler réellement les pages dans Chrome, sur PC et smartphone simulé
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [[ -z "$CHROME_BIN" ]]; then
+            echo "::error::Chrome absent du runner ; le test navigateur ne peut pas être déclaré réussi."
+            exit 1
+          fi
+          export CHROME_BIN
+          node scripts/smoke-cloudflare-browser.cjs
+      - name: Conserver temporairement les captures publiques pour revue visuelle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-publics
+          path: audit-artifacts/
+          retention-days: 1
+          if-no-files-found: ignore

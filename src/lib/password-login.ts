@@ -8,9 +8,7 @@ export type PasswordLoginResult =
 
 type Credentials = { email: string; password: string };
 type LoginError = { message: string; status?: number; code?: string };
-type PasswordLoginSender = (
-  credentials: Credentials,
-) => Promise<{ error: LoginError | null }>;
+type PasswordLoginSender = (credentials: Credentials) => Promise<{ error: LoginError | null }>;
 
 export async function attemptPasswordLogin(
   signIn: PasswordLoginSender,

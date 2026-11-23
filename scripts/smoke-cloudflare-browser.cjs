@@ -93,9 +93,14 @@ async function audit() {
       ]) {
         await page.goto(base + protectedPath, { waitUntil: "domcontentloaded" });
         await page.waitForURL("**/connexion", { timeout: 15000 });
-        assert.ok(
-          (await page.locator("body").innerText()).includes("Connexion"),
-          mode + " " + protectedPath + " did not return to login",
+        await page.locator('input[type="email"]').waitFor({
+          state: "visible",
+          timeout: 10000,
+        });
+        assert.equal(
+          await page.locator('input[type="password"]').count(),
+          1,
+          mode + " " + protectedPath + " missing login form",
         );
         console.log(mode + " " + protectedPath + ": access refused without session");
         passed++;

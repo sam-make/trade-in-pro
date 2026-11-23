@@ -329,3 +329,11 @@ Détails, portée réelle et preuves : [docs/AUDIT_PREPROD_2026-11-23.md](docs/A
 - Supabase cible `xuvaihwygkcwriqfnkbg` : état **ACTIVE_HEALTHY** ; SQL en lecture seule : **17** `auth.users`, **17** `auth.identities`, **24** tables publiques et **24** tables avec RLS activée. Aucun compte ni ligne métier modifié.
 - Cloudflare Worker `trade-in-pro` : `SUPABASE_URL` pointe bien vers le projet cible ; `SUPABASE_PUBLISHABLE_KEY` présente, `SUPABASE_SERVICE_ROLE_KEY` absente des bindings de base. Route publique `workers.dev` **désactivée**, Preview **activée**, branche `migration-cloudflare` visible. L'inventaire du Worker de base ne prouve pas l'état des secrets de chaque Preview ; le dernier audit détaillé indique leur absence sur la Preview et la configuration réelle reste à valider sans exposer de clé.
 - **GO/NO-GO : NO-GO inchangé**. Les 99 tests automatisés, les contrôles Chrome hors session et les simulations SQL ne remplacent pas les JWT réels, les écritures métier, la revue des fonctions privilégiées, le delta final Lovable, la restauration/rollback et le GO explicite. Pas de nouveau déploiement, modification de Lovable, coût ou changement SQL.
+
+
+## Vérification ciblée — 23 novembre 2026, soirée
+- Supabase cible `xuvaihwygkcwriqfnkbg` : projet `ACTIVE_HEALTHY` confirmé par API ; requête SQL en lecture seule : **24 tables publiques / 24 avec RLS activée**.
+- Security Advisor consulté à nouveau : **10 fonctions `SECURITY DEFINER` exécutables par `anon`**, et avertissements correspondants pour `authenticated`. Une quatrième table sans politique a été signalée dans un schéma de sauvegarde privé (`tradein_private_auth_backup`), en plus des trois tables publiques déjà connues. Ce constat ne prouve pas une exposition de ce schéma via l'API ; vérifier les schémas exposés avant toute action.
+- **Aucune correction SQL appliquée** : révoquer globalement `EXECUTE` sans examiner les appels depuis les politiques RLS, triggers et clients risquerait de casser l'application.
+- **NO-GO inchangé** : login historique réel, isolation JWT de deux boutiques, parcours métier et synchronisation finale Lovable non vérifiés. Prochaine action : auditer les appels aux fonctions privilégiées, puis préparer des tests JWT contrôlés et un correctif minimal revu.
+- Aucune donnée personnelle ni secret affiché, aucun déploiement ni modification Lovable.

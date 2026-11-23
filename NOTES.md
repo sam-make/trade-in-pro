@@ -337,3 +337,9 @@ Détails, portée réelle et preuves : [docs/AUDIT_PREPROD_2026-11-23.md](docs/A
 - **Aucune correction SQL appliquée** : révoquer globalement `EXECUTE` sans examiner les appels depuis les politiques RLS, triggers et clients risquerait de casser l'application.
 - **NO-GO inchangé** : login historique réel, isolation JWT de deux boutiques, parcours métier et synchronisation finale Lovable non vérifiés. Prochaine action : auditer les appels aux fonctions privilégiées, puis préparer des tests JWT contrôlés et un correctif minimal revu.
 - Aucune donnée personnelle ni secret affiché, aucun déploiement ni modification Lovable.
+
+
+## Coordination des agents — 23 novembre 2026, soirée
+- Création de `.codex/agents/project_coordinator.toml` sur `migration-cloudflare` : coordinateur chargé de lire les consignes, déléguer aux six agents existants, prioriser Auth/RLS/métier/delta Lovable/Preview, intégrer uniquement des correctifs réversibles et documenter les preuves.
+- Les six agents spécialisés préexistaient et ont été inspectés ; aucun agent n'a été exécuté dans une session Codex par cette création de fichier. Aucune preuve de tests métier supplémentaires ni de réparation de l'authentification à ce stade.
+- GO/NO-GO reste NO-GO ; aucun déploiement public, fusion, modification SQL ou changement Lovable.

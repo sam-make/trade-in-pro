@@ -12,7 +12,10 @@ describe("tentative de connexion Supabase", () => {
   it("signale un mot de passe incorrect sans exposer l'erreur brute", async () => {
     const result = await attemptPasswordLogin(
       async () => ({
-        error: { message: "Invalid login credentials", code: "invalid_credentials" },
+        error: {
+          message: "Invalid login credentials",
+          code: "invalid_credentials",
+        },
       }),
       credentials,
     );
@@ -36,9 +39,7 @@ describe("tentative de connexion Supabase", () => {
   });
 
   it("sort de l'attente si la requête réseau rejette", async () => {
-    const result = await attemptPasswordLogin(async () => {
-      throw new Error("Failed to fetch");
-    }, credentials);
+    const result = await attemptPasswordLogin(async () => { throw new Error("Failed to fetch"); }, credentials);
     expect(result).toEqual({ ok: false, reason: "network" });
   });
 

@@ -76,3 +76,16 @@ Analyse de code SQL vérifiée : `owner_analytics` et `super_admin_mutate` appel
 | Déploiement public Cloudflare | INTERDIT | Approbation explicite non obtenue ; PR #1 reste en brouillon |
 
 La temporisation du smoke HTTP corrige une condition de concurrence possible ; elle **ne constitue pas une validation du rendu courant**. Aucun secret, compte, production Lovable ou base métier modifié.
+
+
+## Contrôle GO/NO-GO du 23 novembre 2026, 16 h 29 (Europe/Amsterdam)
+| Critère | Verdict | Preuve |
+| --- | --- | --- |
+| Qualité / compilation / scan secrets | PASSÉ pour `ff77c65` | [CI 45141286968](https://github.com/sam-make/trade-in-pro/actions/runs/45141286968), jobs réussis |
+| Pages publiques et redirections hors session | PASSÉ pour le smoke HTTP/Chrome | [Run 45141278223](https://github.com/sam-make/trade-in-pro/actions/runs/45141278223), job réussi ; ne valide pas l'authentification réelle |
+| Supabase cible | PARTIEL | Projet `ACTIVE_HEALTHY` ; SELECT 17 comptes, 17 identités, 24 tables, 24 RLS |
+| Cloudflare et secrets | PARTIEL / NO-GO métier | Worker lié au bon projet, route publique désactivée, Preview activée ; clé serveur absente du Worker de base, présence dans Preview non confirmée lors de ce contrôle |
+| Auth réelle, RLS JWT, métiers, delta Lovable, mobile authentifié, rollback | NON VÉRIFIÉ | Aucun test complet avec comptes contrôlés et aucune synchronisation finale lors de ce contrôle |
+| Autorisation de bascule | NON ACQUISE | PR #1 non fusionnée ; déploiement public interdit |
+
+**Décision : NO-GO.** Revoir les secrets de la Preview par canal protégé, tester les parcours authentifiés et contrôler le delta Lovable avant toute nouvelle décision. Ce contrôle a été effectué en lecture seule côté Cloudflare et Supabase.

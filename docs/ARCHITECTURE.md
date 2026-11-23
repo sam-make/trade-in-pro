@@ -1,23 +1,37 @@
-# Architecture cible de Trade-In Pro
+# Architecture cible et état opérationnel de Trade-In Pro
 
-## Source : GitHub
-Le dépôt `sam-make/quick-iphone-quote` contient le code. Chaque travail est proposé sur la branche `migration-cloudflare` dans une pull request, sans écriture directe sur `main`.
+## Source de code : GitHub
 
-## Exécution : Cloudflare Workers
-Trade-In Pro utilise TanStack Start avec Vite et un rendu côté serveur : le serveur doit exécuter le code sur un Worker Cloudflare, et non être déployé comme un simple site statique. La compilation Vite indépendante fonctionne en CI. Il reste à valider le rendu serveur et la connexion réels en environnement de test avant tout déploiement de production.
+Dépôt actuel : `sam-make/trade-in-pro`, branche de travail `migration-cloudflare`, pull request [#1](https://github.com/sam-make/trade-in-pro/pull/1) **en brouillon**. Pas de modification de `main` ni de fusion avant décision explicite.
 
-## Comptes et données : Supabase
-Supabase gère les connexions par e-mail/mot de passe, les boutiques, clients, devis, réparations et factures. Les règles RLS isolent les données des boutiques. La clé `SUPABASE_SERVICE_ROLE_KEY` doit rester strictement côté serveur. Utiliser uniquement le projet de test `trade-in-pro-staging` (gsaazisxtvjhekkwhulz) pour les essais, sans altérer la production.
+## Application : Cloudflare Workers
 
-## Lovable est exclu
-Il ne doit plus être utilisé pour coder, héberger ou authentifier. Des dépendances techniques historiques subsistent tant qu'elles n'ont pas été remplacées et validées. Ne pas confondre « cible sans Lovable » et « migration déjà réalisée ».
+Le code TanStack Start / React fonctionne indépendamment de Lovable ; il est compilé avec Vite et hébergé dans Cloudflare Workers. La préproduction de la branche est accessible sur :
+
+https://migration-cloudflare-trade-in-pro.samysamsung695.workers.dev
+
+Les contrôles CI et les tests navigateur Chrome PC/mobile sans identifiants vérifient les pages publiques et la redirection des pages protégées. Une CI verte ne valide **pas** toutes les écritures Auth, métier ou paiement.
+
+## Données et Auth : projet Supabase autonome
+
+**Projet cible unique** : `xuvaihwygkcwriqfnkbg` (`eu-west-3`). Les comptes Auth et les tables métier restaurés restent à comparer à la source lors de la bascule. Ce projet autonome est déjà peuplé de données réelles : ne pas y ajouter de comptes ou dossiers fictifs sans environnement isolé et autorisation appropriée.
+
+Le projet staging historiquement abandonné **ne doit jamais être utilisé**. La source Lovable Cloud reste la source de vérité pour les données tant que la bascule n'est pas validée.
+
+### Bindings Cloudflare
+
+- `SUPABASE_URL` : URL du projet cible, publique dans les métadonnées HTML SSR.
+- `SUPABASE_PUBLISHABLE_KEY` : clé publiable, autorisée côté navigateur.
+- `SUPABASE_SERVICE_ROLE_KEY` : **clé privée exclusivement serveur**, jamais dans les bundles, métadonnées HTML, journaux, commits ou messages. À ce stade son binding manque en préproduction : les opérations utilisant le client privilégié restent bloquées.
+
+Suivre [ACTIVER_PREPROD_CLOUDFLARE.md](ACTIVER_PREPROD_CLOUDFLARE.md) pour l'activation ponctuelle et sécurisée de ce secret **uniquement dans la Preview**. Ne jamais réduire les politiques RLS pour contourner une clé absente.
 
 ## Sécurité et exploitation
-- Aucun secret dans Git : suivre uniquement `.env.example` avec des valeurs vides.
-- Aucun nouveau service payant sans accord écrit.
-- Conserver inchangés le code de paiement et les SQL de protection du propriétaire jusqu'à autorisation spécifique.
-- Prévoir un export périodique des données de test et vérifier sa restauration.
-- Valider les cinq agents définis dans `AGENTS.md` avant toute déclaration de fin de tâche.
 
-## Configuration publique du navigateur
-Le Worker possède `SUPABASE_URL` et `SUPABASE_PUBLISHABLE_KEY` comme variables de serveur. Le rendu serveur les transmet au navigateur par deux balises HTML `meta` publiques. Ce mécanisme évite de dépendre de variables `VITE_*` lors de la compilation. Les variables `VITE_*` restent possibles en développement local. La clé `SUPABASE_SERVICE_ROLE_KEY` reste strictement côté serveur et n'est jamais transmise à la page.
+- Les politiques RLS doivent cloisonner toutes les données de boutiques ; revues JWT réelles, tests multi-boutiques et des fonctions `SECURITY DEFINER` requis.
+- Les règles d'Auth, les redirections e-mail, le suivi de réparation, les factures, les photos, le super-admin et les parcours mobiles doivent être testés avant l'ouverture publique.
+- Le système de paiement, les tarifs, l'identité du propriétaire et Lovable en production sont conservés sans modification.
+- Hébergement à coût zéro supplémentaire visé, **sous réserve des quotas réels** des offres gratuites ; pas de dépense ou souscription automatique.
+- Sauvegardes restaurables, comparaison finale de la source Lovable après arrêt contrôlé des écritures, plan de retour arrière et autorisation explicite constituent des conditions de GO.
+
+Voir [NOTES.md](../NOTES.md), [AGENTS_PRODUCTION.md](AGENTS_PRODUCTION.md) et [MIGRATION_PRODUCTION.md](MIGRATION_PRODUCTION.md) pour les preuves d'audit et les conditions de mise en production.

@@ -137,6 +137,24 @@ export interface EstimationInput {
   notes?: string | null;
 }
 
+/** Refuse les critères périmés, non autorisés ou dupliqués avant toute écriture. */
+export function validateSelectedRules(
+  selectedIds: string[],
+  activeRules: DeductionRule[],
+): DeductionRule[] {
+  const requested = new Set(selectedIds);
+  const returned = new Set(activeRules.map((rule) => rule.id));
+  if (
+    requested.size !== selectedIds.length ||
+    returned.size !== activeRules.length ||
+    returned.size !== requested.size ||
+    activeRules.some((rule) => !requested.has(rule.id) || rule.active !== true)
+  ) {
+    throw new Error("Critères de déduction indisponibles. Actualisez l'estimation.");
+  }
+  return activeRules;
+}
+
 /**
  * Recomputes the price server-side (never trusting the browser) and persists
  * the estimation plus its defect lines.
@@ -167,13 +185,14 @@ export async function saveEstimation(
     throw new Error("Combinaison couleur / stockage invalide pour ce modèle.");
   }
 
-  const { data: overrides } = await supabase
+  const { data: overrides, error: overridesError } = await supabase
     .from("shop_prices")
     .select("color, base_price")
     .eq("shop_id", profile.shop_id)
     .eq("model_id", input.modelId)
     .eq("storage_gb", input.storageGb)
     .in("color", [input.color, "*"]);
+  if (overridesError) throw new Error("Impossible de vérifier les tarifs boutique.");
 
   const basePrice = resolveBasePrice(
     model.base_price,
@@ -184,13 +203,14 @@ export async function saveEstimation(
 
   let rules: DeductionRule[] = [];
   if (input.ruleIds.length > 0) {
-    const { data } = await supabase
+    const { data, error: rulesError } = await supabase
       .from("deduction_rules")
       .select("id, name, category, deduction, is_blocking, active, sort_order")
       .eq("shop_id", profile.shop_id)
       .eq("active", true)
       .in("id", input.ruleIds);
-    rules = (data ?? []) as DeductionRule[];
+    if (rulesError) throw new Error("Impossible de vérifier les critères de déduction.");
+    rules = validateSelectedRules(input.ruleIds, (data ?? []) as DeductionRule[]);
   }
 
   const breakdown = computePrice(basePrice, rules);

@@ -83,6 +83,34 @@ async function audit() {
       console.log(mode + ": navigation Connexion → Mot de passe oublié OK");
       passed++;
 
+      // Verify unauthenticated browsers cannot reach the shop or owner pages.
+      for (const protectedPath of [
+        "/tableau-de-bord",
+        "/clients",
+        "/reparations",
+        "/estimation",
+        "/admin",
+      ]) {
+        await page.goto(base + protectedPath, { waitUntil: "domcontentloaded" });
+        await page.waitForURL("**/connexion", { timeout: 15000 });
+        assert.ok(
+          (await page.locator("body").innerText()).includes("Connexion"),
+          mode + " " + protectedPath + " did not return to login",
+        );
+        console.log(mode + " " + protectedPath + ": access refused without session");
+        passed++;
+      }
+
+      // Browser-native validation: invalid empty login must not send an Auth request.
+      await page.goto(base + "/connexion", { waitUntil: "domcontentloaded" });
+      await page.locator('button[type="submit"]').click();
+      const emailMissing = await page.locator('input[type="email"]').evaluate((input) => {
+        return input.validity.valueMissing;
+      });
+      assert.equal(emailMissing, true, mode + " missing required email was accepted");
+      console.log(mode + ": empty login blocked by form validation");
+      passed++;
+
       const response = await context.request.get(base + "/sitemap.xml", { timeout: 25000 });
       assert.equal(response.status(), 200, mode + " sitemap HTTP");
       const xml = await response.text();

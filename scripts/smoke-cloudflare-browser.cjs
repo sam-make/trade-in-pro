@@ -74,6 +74,20 @@ async function audit() {
         if (path === "/inscription") {
           assert.ok((await page.locator('input[type="password"]').count()) >= 1);
         }
+        if (path === "/") {
+          // Reveal animations are viewport-triggered: actually scroll the page.
+          const height = await page.evaluate(() => document.documentElement.scrollHeight);
+          const step = mode === "mobile" ? 420 : 600;
+          for (let scrollY = 0; scrollY < height; scrollY += step) {
+            await page.evaluate((y) => window.scrollTo(0, y), scrollY);
+            await page.waitForTimeout(80);
+          }
+          await page.waitForTimeout(550);
+          const hiddenReveals = await page.locator(".motion-reveal:not(.motion-visible)").count();
+          assert.equal(hiddenReveals, 0, mode + " unrevealed landing-page content");
+          await page.evaluate(() => window.scrollTo(0, 0));
+          console.log(mode + ": sections dévoilées correctement au défilement");
+        }
         if (["/", "/connexion", "/inscription"].includes(path)) {
           const pageName = path === "/" ? "accueil" : path.slice(1);
           await page.screenshot({

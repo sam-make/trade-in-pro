@@ -1,9 +1,7 @@
 import type { Session } from "@supabase/supabase-js";
 
 /** Keeps an older getSession response from replacing a newer Auth event. */
-export function createSessionBootstrap(
-  apply: (session: Session | null) => void,
-) {
+export function createSessionBootstrap(apply: (session: Session | null) => void) {
   let stopped = false;
   let receivedAuthEvent = false;
 

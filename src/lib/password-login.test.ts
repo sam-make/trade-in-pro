@@ -39,7 +39,9 @@ describe("tentative de connexion Supabase", () => {
   });
 
   it("sort de l'attente si la requête réseau rejette", async () => {
-    const result = await attemptPasswordLogin(async () => { throw new Error("Failed to fetch"); }, credentials);
+    const result = await attemptPasswordLogin(async () => {
+      throw new Error("Failed to fetch");
+    }, credentials);
     expect(result).toEqual({ ok: false, reason: "network" });
   });
 

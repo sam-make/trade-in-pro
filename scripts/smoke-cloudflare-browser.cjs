@@ -1,8 +1,6 @@
 /* Browser smoke test: no user credentials, no writes, no customer data. */
 const assert = require("node:assert/strict");
-const { chromium } = require(
-  "/tmp/trade-in-playwright/node_modules/playwright-core",
-);
+const { chromium } = require("/tmp/trade-in-playwright/node_modules/playwright-core");
 
 const base = "https://migration-cloudflare-trade-in-pro.samysamsung695.workers.dev";
 const expectedProject = "https://xuvaihwygkcwriqfnkbg.supabase.co";
@@ -51,14 +49,20 @@ async function audit() {
           bodyText.includes(expectedText.toLowerCase()),
           mode + " " + path + " expected content absent",
         );
-        const publicUrl = await page.locator('meta[name="trade-in-supabase-url"]').getAttribute("content");
+        const publicUrl = await page
+          .locator('meta[name="trade-in-supabase-url"]')
+          .getAttribute("content");
         assert.equal(publicUrl, expectedProject, mode + " " + path + " wrong Supabase target");
-        const pubKey = await page.locator('meta[name="trade-in-supabase-publishable-key"]').getAttribute("content");
+        const pubKey = await page
+          .locator('meta[name="trade-in-supabase-publishable-key"]')
+          .getAttribute("content");
         assert.ok(pubKey?.startsWith("sb_publishable_"), mode + " " + path + " no public key");
         assert.equal(pageErrors.length, 0, mode + " " + path + " JS error");
 
         if (mode === "mobile") {
-          const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+          const overflow = await page.evaluate(
+            () => document.documentElement.scrollWidth - window.innerWidth,
+          );
           assert.ok(overflow <= 2, mode + " " + path + " horizontal overflow");
         }
         if (path === "/connexion") {
@@ -83,7 +87,10 @@ async function audit() {
       assert.equal(response.status(), 200, mode + " sitemap HTTP");
       const xml = await response.text();
       assert.ok(xml.includes("<urlset"), mode + " sitemap XML missing");
-      assert.ok(!xml.includes("/tableau-de-bord") && !xml.includes("/admin"), "private routes in sitemap");
+      assert.ok(
+        !xml.includes("/tableau-de-bord") && !xml.includes("/admin"),
+        "private routes in sitemap",
+      );
       console.log(mode + ": sitemap accessible sans routes privées");
       passed++;
 
@@ -96,7 +103,10 @@ async function audit() {
 }
 
 audit().catch((error) => {
-  const message = String(error.message || error).replace(/sb_(?:publishable|secret)_[A-Za-z0-9_-]+/g, "[redacted]");
+  const message = String(error.message || error).replace(
+    /sb_(?:publishable|secret)_[A-Za-z0-9_-]+/g,
+    "[redacted]",
+  );
   console.error("Audit navigateur échoué :", message.slice(0, 500));
   process.exitCode = 1;
 });

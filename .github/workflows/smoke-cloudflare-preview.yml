@@ -29,3 +29,11 @@ jobs:
           fi
           export CHROME_BIN
           node scripts/smoke-cloudflare-browser.cjs
+      - name: Conserver temporairement les captures publiques pour revue visuelle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-publics
+          path: audit-artifacts/
+          retention-days: 1
+          if-no-files-found: ignore

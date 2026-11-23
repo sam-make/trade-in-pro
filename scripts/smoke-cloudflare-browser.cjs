@@ -1,5 +1,6 @@
 /* Browser smoke test: no user credentials, no writes, no customer data. */
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
 const { chromium } = require("/tmp/trade-in-playwright/node_modules/playwright-core");
 
 const base = "https://migration-cloudflare-trade-in-pro.samysamsung695.workers.dev";
@@ -22,6 +23,7 @@ async function audit() {
     ["/cgv", "conditions"],
   ];
   let passed = 0;
+  fs.mkdirSync("audit-artifacts", { recursive: true });
 
   try {
     for (const mode of ["desktop", "mobile"]) {
@@ -71,6 +73,14 @@ async function audit() {
         }
         if (path === "/inscription") {
           assert.ok((await page.locator('input[type="password"]').count()) >= 1);
+        }
+        if (["/", "/connexion", "/inscription"].includes(path)) {
+          const pageName = path === "/" ? "accueil" : path.slice(1);
+          await page.screenshot({
+            path: "audit-artifacts/" + mode + "-" + pageName + ".png",
+            fullPage: true,
+            animations: "disabled",
+          });
         }
         console.log(mode + " " + path + ": HTTP 200, contenu et configuration client OK");
         passed++;

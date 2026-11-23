@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuthHook";
 import { supabase } from "@/integrations/supabase/client";
+import { attemptPasswordLogin } from "@/lib/password-login";
 
 export const Route = createFileRoute("/connexion")({
   staticData: { sitemap: false },
@@ -56,23 +57,21 @@ function LoginPage() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    const result = await attemptPasswordLogin(
+      (credentials) => supabase.auth.signInWithPassword(credentials),
+      parsed.data,
+    );
     setSubmitting(false);
-    if (error) {
-      const message = error.message.toLowerCase();
-      if (message.includes("not confirmed")) {
-        setUnconfirmed(true);
-        toast.error("Adresse e-mail non confirmée : ouvrez le lien reçu par e-mail.");
-      } else if (message.includes("invalid login credentials")) {
-        setUnconfirmed(false);
-        toast.error(
-          "E-mail ou mot de passe incorrect. Utilisez « Mot de passe oublié ? » si besoin.",
-        );
-      } else if (error.status === 429) {
-        toast.error("Trop de tentatives. Patientez quelques minutes.");
-      } else {
-        toast.error(error.message);
-      }
+    if (!result.ok) {
+      setUnconfirmed(result.reason === "unconfirmed");
+      const messages = {
+        unconfirmed: "Adresse e-mail non confirmée : ouvrez le lien reçu par e-mail.",
+        invalid: "E-mail ou mot de passe incorrect. Utilisez « Mot de passe oublié ? » si besoin.",
+        rate_limit: "Trop de tentatives. Patientez quelques minutes.",
+        unavailable: "Connexion temporairement indisponible. Réessayez plus tard.",
+        network: "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+      };
+      toast.error(messages[result.reason]);
       return;
     }
     navigate({ to: "/tableau-de-bord", replace: true });

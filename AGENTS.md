@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Project rules
+- Appearance is owned by the root ThemeProvider and semantic CSS tokens, with a local saved choice and device fallback; keep print sheets light so barcodes and receipts remain printable.
 - Google sign-in uses the generated Lovable helper and returns to the public login page; existing session handling opens the shop only after authentication.
 - AI defect assistance validates suggestions against the caller's active shop rules and rejects price fields; human confirmation preserves the authoritative pricing engine.
 - Estimations, estimation defects, invoices, repairs, repair items and repair status history are written only by server functions using the admin client after tenant checks; authenticated users have no INSERT grant, so prices and totals can never come from the browser.

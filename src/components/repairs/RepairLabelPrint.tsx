@@ -96,7 +96,7 @@ export function RepairLabelPrint({
         </div>
 
         {/* Preview + print sheet (only this area is printed) */}
-        <div className="overflow-auto rounded-xl border border-border bg-white p-4">
+        <div className="overflow-auto rounded-xl border border-border bg-muted p-4">
           <div
             ref={sheetRef}
             className="print-sheet mx-auto flex flex-col bg-white text-black"

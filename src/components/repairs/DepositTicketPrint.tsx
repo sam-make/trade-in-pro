@@ -95,13 +95,13 @@ export function DepositTicketPrint({
         </DialogHeader>
 
         {missing.length > 0 && (
-          <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
+          <p className="rounded-lg bg-warning/10 px-3 py-2 text-xs text-foreground">
             Coordonnées boutique à compléter dans Administration → Boutique : {missing.join(", ")}.
             Les horaires d'ouverture ne sont pas encore enregistrés dans l'application.
           </p>
         )}
 
-        <div className="overflow-auto rounded-xl border border-border bg-white p-4">
+        <div className="overflow-auto rounded-xl border border-border bg-muted p-4">
           <div
             ref={sheetRef}
             className="print-sheet mx-auto bg-white text-black"

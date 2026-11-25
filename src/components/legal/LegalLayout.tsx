@@ -13,7 +13,7 @@ export function LegalSection({ title, children }: { title: string; children: Rea
 
 export function Missing({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded bg-amber-100 px-1.5 py-0.5 font-medium text-amber-900">
+    <span className="rounded bg-warning/15 px-1.5 py-0.5 font-medium text-foreground">
       À compléter : {children}
     </span>
   );
@@ -41,7 +41,7 @@ export function LegalLayout({
         </div>
       </header>
       <main className="mx-auto max-w-3xl px-5 py-10">
-        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <p className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-foreground">
           Document préparatoire : les mentions signalées « À compléter » doivent être renseignées et
           validées avant toute mise en ligne commerciale. Ce document n’a pas encore été validé par un professionnel du droit.
         </p>

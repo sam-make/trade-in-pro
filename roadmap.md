@@ -1,5 +1,10 @@
 # Roadmap — Motion Design global Trade-In Pro
 
+## Modes clair et sombre
+- [x] Ajouter le choix d’apparence global et conserver la préférence sur cet appareil.
+- [x] Compléter les couleurs sombres des pages, menus, formulaires et notifications sans changer les impressions.
+- [x] Vérifier le changement, l’actualisation et les pages publiques/connectées sur téléphone et ordinateur.
+
 ## Google sign-in
 - [x] Reuse existing profiles, roles and Google provider configuration.
 - [x] Add a branded Google button to the login screen and session-aware home navigation.

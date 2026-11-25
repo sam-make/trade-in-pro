@@ -343,3 +343,11 @@ Détails, portée réelle et preuves : [docs/AUDIT_PREPROD_2026-11-23.md](docs/A
 - Création de `.codex/agents/project_coordinator.toml` sur `migration-cloudflare` : coordinateur chargé de lire les consignes, déléguer aux six agents existants, prioriser Auth/RLS/métier/delta Lovable/Preview, intégrer uniquement des correctifs réversibles et documenter les preuves.
 - Les six agents spécialisés préexistaient et ont été inspectés ; aucun agent n'a été exécuté dans une session Codex par cette création de fichier. Aucune preuve de tests métier supplémentaires ni de réparation de l'authentification à ce stade.
 - GO/NO-GO reste NO-GO ; aucun déploiement public, fusion, modification SQL ou changement Lovable.
+
+
+## Audit P0 du 25 novembre 2026
+- PR #1 ouverte en brouillon ; CI et contrôle agents réussis sur `9e329b4` (résultats GitHub Actions associés au commit).
+- Supabase cible, SELECT sur pg_proc/pg_depend/pg_policy/pg_trigger : dépendances directes des politiques pour `current_shop_id` **49**, `business_access_allowed` **36**, `has_role` **18**, `is_super_admin` **2**. Ces nombres ne sont pas additifs. Une révocation globale pourrait casser les politiques.
+- `capture_shop_activity` et `guard_member_access` retournent trigger et sont utilisées par **4** et **2** triggers respectivement ; EXECUTE anon encore accordé. Candidats à une restriction ciblée après test transactionnel des triggers et revue des privilèges hérités PUBLIC. Les quatre autres fonctions exposées sans dépendance directe de policy/trigger doivent être examinées pour appels RPC et dépendances indirectes.
+- Worker Cloudflare de base : deux bindings publics présents, clé serveur absente ; Preview spécifique non inspectée aujourd'hui.
+- GO/NO-GO : **NO-GO**. Auth historique, JWT réels, écritures métier, delta Lovable final et rollback NON VÉRIFIÉS. Aucun SQL appliqué ni changement Lovable/production.

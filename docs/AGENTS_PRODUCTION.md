@@ -89,3 +89,11 @@ La temporisation du smoke HTTP corrige une condition de concurrence possible ; e
 | Autorisation de bascule | NON ACQUISE | PR #1 non fusionnée ; déploiement public interdit |
 
 **Décision : NO-GO.** Revoir les secrets de la Preview par canal protégé, tester les parcours authentifiés et contrôler le delta Lovable avant toute nouvelle décision. Ce contrôle a été effectué en lecture seule côté Cloudflare et Supabase.
+
+
+## Audit P0 du 25 novembre 2026
+- PR #1 ouverte en brouillon ; CI et contrôle agents réussis sur `9e329b4` (résultats GitHub Actions associés au commit).
+- Supabase cible, SELECT sur pg_proc/pg_depend/pg_policy/pg_trigger : dépendances directes des politiques pour `current_shop_id` **49**, `business_access_allowed` **36**, `has_role` **18**, `is_super_admin` **2**. Ces nombres ne sont pas additifs. Une révocation globale pourrait casser les politiques.
+- `capture_shop_activity` et `guard_member_access` retournent trigger et sont utilisées par **4** et **2** triggers respectivement ; EXECUTE anon encore accordé. Candidats à une restriction ciblée après test transactionnel des triggers et revue des privilèges hérités PUBLIC. Les quatre autres fonctions exposées sans dépendance directe de policy/trigger doivent être examinées pour appels RPC et dépendances indirectes.
+- Worker Cloudflare de base : deux bindings publics présents, clé serveur absente ; Preview spécifique non inspectée aujourd'hui.
+- GO/NO-GO : **NO-GO**. Auth historique, JWT réels, écritures métier, delta Lovable final et rollback NON VÉRIFIÉS. Aucun SQL appliqué ni changement Lovable/production.

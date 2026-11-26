@@ -401,9 +401,10 @@ function AdminPage() {
                 </h3>
                 <ul className="divide-y divide-border">
                   {items.map((rule) => (
-                    <li key={rule.id} className="flex flex-wrap items-center gap-3 px-6 py-3">
+                    <li key={rule.id} className="grid grid-cols-[1fr_auto] items-center gap-3 px-3 py-4 sm:flex sm:flex-wrap sm:px-6">
                       <Input
-                        className="h-9 max-w-xs flex-1"
+                        className="col-span-2 min-w-0 sm:max-w-xs sm:flex-1"
+                        aria-label="Nom de la règle"
                         defaultValue={rule.name}
                         onBlur={(event) => {
                           const value = event.target.value.trim();
@@ -414,7 +415,8 @@ function AdminPage() {
                       />
                       <div className="flex items-center gap-2">
                         <Input
-                          className="h-9 w-24"
+                          className="w-24"
+                          aria-label="Montant de la déduction"
                           type="number"
                           min={0}
                           disabled={rule.is_blocking}
@@ -428,7 +430,7 @@ function AdminPage() {
                         />
                         <span className="text-sm text-muted-foreground">€</span>
                       </div>
-                      <div className="ml-auto flex items-center gap-3">
+                      <div className="ml-auto flex items-center gap-2 sm:gap-3">
                         <span className="text-xs text-muted-foreground">{rule.active ? "Active" : "Inactive"}</span>
                         <Switch
                           checked={rule.active}

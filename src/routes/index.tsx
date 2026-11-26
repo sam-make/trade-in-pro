@@ -17,6 +17,7 @@ import {
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/motion";
+import { ThemeControls } from "@/components/app/ThemeProvider";
 import dashboardShot from "@/assets/screen-dashboard.jpg";
 import estimationShot from "@/assets/screen-estimation.jpg";
 
@@ -108,9 +109,9 @@ function Landing() {
     };
   }, []);
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
+    <div className="min-h-screen bg-surface">
+      <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-5">
           <Logo />
           <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
             <a className="transition-colors hover:text-foreground" href="#fonctionnalites">
@@ -120,7 +121,8 @@ function Landing() {
               Aperçu
             </a>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <div className="hidden md:block"><ThemeControls /></div>
             {session ? (
               <>
                 <Button asChild size="sm"><Link to="/tableau-de-bord">Ma boutique</Link></Button>
@@ -131,7 +133,7 @@ function Landing() {
             <Button asChild variant="ghost" size="sm">
               <Link to="/connexion">Se connecter</Link>
             </Button>
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="hidden sm:inline-flex">
               <Link to="/inscription">Créer un compte</Link>
             </Button>
               </>
@@ -141,21 +143,20 @@ function Landing() {
       </header>
 
       <main>
-        <section className="hero-glow relative overflow-hidden">
-          <div className="mx-auto max-w-6xl px-5 pb-20 pt-20 text-center md:pt-28">
-            <span className="animate-rise inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-[var(--shadow-xs)]">
+        <section className="relative overflow-hidden bg-surface">
+          <div className="mx-auto max-w-6xl px-5 pb-10 pt-12 text-center md:pt-16">
+            <span className="animate-rise inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
               <ShieldCheck className="size-3.5 text-primary" />
               Pensé par un réparateur, pour des réparateurs
             </span>
             <h1
-              className="animate-rise mx-auto mt-7 max-w-3xl text-4xl font-semibold leading-[1.05] text-ink md:text-6xl"
+              className="animate-rise mx-auto mt-5 max-w-3xl text-4xl font-semibold leading-tight text-ink md:text-6xl"
               style={{ animationDelay: "90ms" }}
             >
-              L'estimation de reprise iPhone,
-              <span className="text-gradient"> enfin sans appeler le responsable.</span>
+              Trade-In <span className="text-primary">Pro</span>
             </h1>
             <p
-              className="animate-rise mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
+              className="animate-rise mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
               style={{ animationDelay: "180ms" }}
             >
               Trade-In Pro donne à vos vendeurs un prix de reprise fiable en moins de deux minutes,
@@ -163,7 +164,7 @@ function Landing() {
               vous-même.
             </p>
             <div
-              className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3"
+              className="animate-rise mt-7 flex flex-wrap items-center justify-center gap-3"
               style={{ animationDelay: "270ms" }}
             >
               <Button asChild size="lg">
@@ -177,14 +178,14 @@ function Landing() {
               </Button>
             </div>
 
-            <div className="animate-rise mx-auto mt-16 max-w-5xl" style={{ animationDelay: "380ms" }}>
-              <div className="surface-card overflow-hidden p-2 shadow-[var(--shadow-float)]">
+            <div className="animate-rise mx-auto mt-10 max-w-5xl" style={{ animationDelay: "380ms" }}>
+              <div className="overflow-hidden border-t border-border pt-6">
                 <img
                   src={dashboardShot}
                   alt="Aperçu du tableau de bord Trade-In Pro avec le prix de reprise calculé"
                   width={1600}
                   height={1008}
-                  className="w-full rounded-[calc(var(--radius-xl)-4px)]"
+                  className="w-full"
                 />
               </div>
             </div>
@@ -203,8 +204,8 @@ function Landing() {
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature, i) => (
                 <Reveal key={feature.title} delay={(i % 3) * 90}>
-                  <article className="surface-card group h-full p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-float)]">
-                    <span className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                  <article className="group h-full border-t border-border py-6">
+                    <span className="grid size-10 place-items-center rounded-lg bg-accent text-primary">
                       <feature.icon className="size-5" />
                     </span>
                     <h3 className="mt-5 text-base font-semibold text-ink">{feature.title}</h3>
@@ -245,7 +246,7 @@ function Landing() {
             </div>
             </Reveal>
             <Reveal delay={120}>
-            <div className="surface-card overflow-hidden p-2">
+            <div className="overflow-hidden">
               <img
                 src={estimationShot}
                 alt="Aperçu du module de diagnostic technique de Trade-In Pro"
@@ -259,17 +260,17 @@ function Landing() {
           </div>
         </section>
 
-        <section className="px-5 pb-24">
+        <section className="border-y border-border bg-accent/40 px-5 py-14">
           <Reveal>
-          <div className="mx-auto max-w-5xl rounded-3xl bg-[image:var(--gradient-primary)] px-8 py-14 text-center text-primary-foreground shadow-[var(--shadow-float)]">
+          <div className="mx-auto max-w-5xl text-center text-ink">
             <h2 className="text-3xl font-semibold md:text-4xl">
               Prêt à fiabiliser vos reprises&nbsp;?
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-primary-foreground/80">
+            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
               Créez l'espace de votre boutique, importez vos règles de déduction et lancez votre
               première estimation dans la foulée.
             </p>
-            <Button asChild size="lg" variant="secondary" className="mt-8">
+            <Button asChild size="lg" className="mt-8">
               <Link to="/inscription">
                 Démarrer maintenant
                 <ArrowRight className="size-4" />
@@ -283,6 +284,7 @@ function Landing() {
       <footer className="border-t border-border/70 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 text-sm text-muted-foreground sm:flex-row">
           <Logo />
+          <div className="md:hidden"><ThemeControls /></div>
           <nav className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/mentions-legales" className="hover:text-ink">
               Mentions légales

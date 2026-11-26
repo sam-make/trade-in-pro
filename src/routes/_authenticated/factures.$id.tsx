@@ -66,7 +66,7 @@ function InvoicePage() {
         </Button>
       </div>
 
-      <article className="surface-card space-y-6 p-8">
+      <article className="surface-card space-y-6 p-4 sm:p-8">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold text-ink">Facture {invoice.number}</h1>

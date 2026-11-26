@@ -4,20 +4,21 @@ import { useServerFn } from "@tanstack/react-start";
 import { ownerAccess } from "@/lib/super-admin.functions";
 import { useEffect, useState, type ReactNode } from "react";
 import { recordShopPresence } from "@/lib/owner-analytics.functions";
-import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
+import { AlertTriangle, Gauge, Home, Loader2, History, LogOut, Menu, MoreHorizontal, Settings, Sparkles, Store, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
 import { PageTransition } from "@/components/motion";
 import { cn } from "@/lib/utils";
+import { ThemeControls } from "@/components/app/ThemeProvider";
 
 const NAV = [
   { to: "/tableau-de-bord", label: "Tableau de bord", icon: Gauge },
-  { to: "/clients", label: "Clients", icon: Users },
   { to: "/reparations", label: "Réparations", icon: Wrench },
-  { to: "/estimation", label: "Nouvelle estimation", icon: Sparkles },
+  { to: "/estimation", label: "Estimation", icon: Sparkles },
   { to: "/historique", label: "Historique", icon: History },
+  { to: "/clients", label: "Clients", icon: Users },
   { to: "/administration", label: "Administration", icon: Settings, adminOnly: true },
 ] as const;
 
@@ -55,19 +56,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const items = NAV.filter((item) => !("adminOnly" in item && item.adminOnly) || !roleKnown || workspace?.role === "admin");
 
   const nav = (
-    <nav className="flex flex-col gap-1">
+    <nav aria-label="Navigation de la boutique" className="flex flex-col gap-1">
       {items.map((item) => {
         const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
         return (
           <Link
             key={item.to}
             to={item.to}
+            aria-current={active ? "page" : undefined}
             onClick={() => setOpen(false)}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+              "flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-200",
               active
-                ? "bg-surface text-ink shadow-[var(--shadow-xs)]"
-                : "text-muted-foreground hover:bg-surface/70 hover:text-foreground",
+                ? "bg-accent text-primary"
+                : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
             )}
           >
             <item.icon className={cn("size-4", active && "text-primary")} />
@@ -78,18 +80,19 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
         );
       })}
-      {owner.data === true && <Link to="/admin" onClick={() => setOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium", pathname === "/admin" ? "bg-surface text-ink" : "text-muted-foreground")}><Settings className="size-4 text-primary" />Super Administration</Link>}
+      {owner.data === true && <Link to="/admin" onClick={() => setOpen(false)} className={cn("flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium", pathname === "/admin" ? "bg-accent text-primary" : "text-muted-foreground")}><Settings className="size-4" />Super Administration</Link>}
     </nav>
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-surface-2">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-border/70 bg-surface-2 px-4 py-6 lg:flex">
+    <div className="flex min-h-dvh w-full bg-surface">
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
         <Link to="/tableau-de-bord" className="px-2">
           <Logo />
         </Link>
         <div className="mt-8 flex-1">{nav}</div>
-        <div className="rounded-xl border border-border bg-surface p-3">
+        <div className="border-t border-border px-2 pt-5">
+          <Store className="mb-2 size-4 text-muted-foreground" />
           <p className="truncate text-sm font-medium text-ink">{workspace?.shop.name ?? "…"}</p>
           <p className="truncate text-xs text-muted-foreground">{workspace?.profile.full_name}</p>
           <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
@@ -100,32 +103,24 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border/70 bg-surface-2/85 px-5 backdrop-blur-xl lg:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-surface/95 px-4 backdrop-blur-xl lg:px-8">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setOpen((value) => !value)}
-              aria-label="Menu"
-            >
-              {open ? <X className="size-5" /> : <Menu className="size-5" />}
-            </Button>
-            <span className="text-sm font-medium text-muted-foreground">
+            <Link to="/tableau-de-bord" className="lg:hidden"><Logo /></Link>
+            <span className="hidden text-sm font-medium text-muted-foreground lg:block">
               {workspace?.shop.name ?? "Chargement…"}
             </span>
           </div>
-          <Button asChild size="sm">
-            <Link to="/estimation">
-              <Sparkles className="size-4" />
-              Nouvelle estimation
-            </Link>
+          <div className="hidden lg:flex"><ThemeControls /></div>
+          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen((value) => !value)} aria-label={open ? "Fermer le menu" : "Menu"} aria-expanded={open} aria-controls="mobile-workshop-menu">
+            {open ? <X /> : <Menu />}
           </Button>
         </header>
 
         {open && (
-          <div className="animate-fade-up border-b border-border/70 bg-surface-2 px-4 py-4 lg:hidden">
+          <div id="mobile-workshop-menu" className="fixed inset-x-0 bottom-16 top-16 z-40 overflow-y-auto border-b border-border bg-surface px-4 py-5 lg:hidden">
+            <p className="mb-4 border-b border-border pb-4 text-sm font-semibold text-ink">{workspace?.shop.name ?? "Chargement…"}</p>
             {nav}
+            <div className="mt-5 flex items-center justify-between border-t border-border pt-4"><span className="text-sm text-muted-foreground">Apparence</span><ThemeControls /></div>
             <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
               <LogOut className="size-4" />
               Déconnexion
@@ -143,10 +138,21 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         )}
 
-        <main className="flex-1 px-5 py-8 lg:px-8">
+        <main className="workshop-main min-w-0 flex-1 px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-10 lg:pt-8">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
+      <nav aria-label="Navigation mobile" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden">
+        {[
+          { to: "/tableau-de-bord", label: "Accueil", icon: Home },
+          { to: "/reparations", label: "Réparations", icon: Wrench },
+          { to: "/estimation", label: "Estimation", icon: Sparkles },
+        ].map((item) => {
+          const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+          return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined} className={cn("flex min-h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium", active ? "text-primary" : "text-muted-foreground")}><item.icon className="size-5" />{item.label}</Link>;
+        })}
+        <Button variant="ghost" className={cn("min-h-16 flex-col gap-1 rounded-none text-[11px] font-medium", open || ["/clients", "/historique", "/administration", "/admin"].some((path) => pathname.startsWith(path)) ? "text-primary" : "text-muted-foreground")} onClick={() => setOpen((value) => !value)} aria-label="Plus de rubriques" aria-expanded={open} aria-controls="mobile-workshop-menu"><MoreHorizontal className="size-5" />Plus</Button>
+      </nav>
     </div>
   );
 }

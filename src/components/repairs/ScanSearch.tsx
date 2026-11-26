@@ -47,10 +47,10 @@ export function ScanSearch() {
 
   return (
     <div className="relative">
-      <ScanBarcode className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <ScanBarcode className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-primary" />
       <Input
-        className="pl-9"
-        placeholder="Scanner ou saisir une référence (REP-2026-0001)…"
+        className="h-14 border-transparent bg-accent/60 pl-12 focus-visible:border-primary"
+        placeholder="Scanner ou saisir une référence"
         value={value}
         disabled={busy}
         onChange={(event) => setValue(event.target.value)}

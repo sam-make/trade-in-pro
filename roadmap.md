@@ -1,5 +1,10 @@
 # Roadmap — Motion Design global Trade-In Pro
 
+## Refonte visuelle approuvée — toutes les pages
+- [x] Décliner la maquette bleu clair/blanc dans le style commun, la navigation et les pages publiques et métier.
+- [x] Préserver données, droits, calculs, suivi et impressions ; ne pas publier.
+- [x] Vérifier les pages sur téléphone et ordinateur, le parcours connecté et les tests existants (74 réussis ; /admin testé en accès refusé, pas avec le compte propriétaire ; impression physique non testée).
+
 ## Modes clair et sombre
 - [x] Ajouter le choix d’apparence global et conserver la préférence sur cet appareil.
 - [x] Compléter les couleurs sombres des pages, menus, formulaires et notifications sans changer les impressions.

@@ -49,7 +49,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 export function ThemeControls() {
   const { theme, setTheme } = useTheme();
   return (
-    <div className="flex h-12 shrink-0 items-center justify-end border-b border-border/70 bg-background px-5 print:hidden">
+    <div className="flex shrink-0 items-center print:hidden">
       <div role="group" aria-label="Apparence" className="flex items-center gap-1">
         <Button variant={theme === "light" ? "secondary" : "ghost"} size="icon" aria-label="Mode clair" title="Mode clair" aria-pressed={theme === "light"} onClick={() => setTheme("light")}>
           <Sun aria-hidden="true" />

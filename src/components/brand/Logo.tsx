@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 export function Logo({ className, compact = false }: { className?: string; compact?: boolean }) {
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
-      <span className="grid size-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-xs)]">
+      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent text-primary">
         <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={1.9}>
           <rect x="6" y="2.5" width="12" height="19" rx="3" />
           <path d="M9.5 9.5a3.4 3.4 0 0 1 5.4-.8M14.5 14.5a3.4 3.4 0 0 1-5.4.8" strokeLinecap="round" />
@@ -11,7 +11,7 @@ export function Logo({ className, compact = false }: { className?: string; compa
         </svg>
       </span>
       {!compact && (
-        <span className="font-[family-name:var(--font-display)] text-[1.05rem] font-semibold tracking-tight text-ink">
+        <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-[1.05rem] font-semibold text-ink">
           Trade-In <span className="text-primary">Pro</span>
         </span>
       )}

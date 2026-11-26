@@ -6,6 +6,9 @@ import { getPublicTracking } from "@/lib/repairs.functions";
 import { PUBLIC_STEP_LABELS, type PublicTrackingDto } from "@/lib/tracking";
 import { formatDateTime } from "@/lib/repairs";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/brand/Logo";
+import { ThemeControls } from "@/components/app/ThemeProvider";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/suivi/$token")({
   staticData: { sitemap: false },
@@ -72,8 +75,9 @@ function PublicTrackingPage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background px-4 py-8">
-      <div className="mx-auto max-w-md space-y-5">{children}</div>
+    <div className="min-h-screen bg-surface">
+      <div className="mx-auto flex max-w-md items-center justify-between border-b border-border px-4 py-3"><Logo /><ThemeControls /></div>
+      <main className="workshop-main mx-auto max-w-md space-y-5 px-4 py-8">{children}</main>
     </div>
   );
 }
@@ -176,24 +180,20 @@ function TrackingContent({ data }: { data: PublicTrackingDto }) {
         {data.shop.phone && <p className="text-sm text-muted-foreground">{data.shop.phone}</p>}
         <div className="mt-3 flex flex-wrap gap-2">
           {data.shop.phone && (
-            <a
-              href={`tel:${data.shop.phone.replace(/\s/g, "")}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
-            >
+            <Button asChild size="sm"><a href={`tel:${data.shop.phone.replace(/\s/g, "")}`}>
               <Phone className="size-3.5" />
               Appeler
-            </a>
+            </a></Button>
           )}
           {mapsUrl && (
-            <a
+            <Button asChild size="sm" variant="outline"><a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-ink"
             >
               <MapPin className="size-3.5" />
               Itinéraire
-            </a>
+            </a></Button>
           )}
         </div>
       </section>

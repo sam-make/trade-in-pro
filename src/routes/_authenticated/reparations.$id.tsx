@@ -172,21 +172,23 @@ function RepairDetailPage() {
           {REPAIR_STATUSES.map((value) => {
             const rule = canChangeStatus(repair.status as RepairStatus, value, { invoiced: !!data.invoice });
             return (
-            <button
+            <Button
               key={value}
               type="button"
+              variant="outline"
+              size="sm"
               title={rule.ok ? undefined : rule.reason}
               disabled={statusMutation.isPending || !rule.ok}
               onClick={() => statusMutation.mutate(value)}
               className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                "px-3 text-xs font-medium",
                 value === repair.status
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border text-muted-foreground hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40",
               )}
             >
               {STATUS_LABELS[value]}
-            </button>
+            </Button>
             );
           })}
         </div>
@@ -291,9 +293,10 @@ function RepairDetailPage() {
 
       <section className="surface-card p-6">
         <h2 className="text-sm font-semibold text-ink">Historique</h2>
-        <ol className="mt-3 space-y-3 text-sm">
+        <ol className="mt-5 ml-2 border-l border-border text-sm">
           {data.history.map((entry) => (
-            <li key={entry.id} className="flex flex-wrap items-center gap-2">
+            <li key={entry.id} className="relative flex flex-col items-start gap-2 pb-6 pl-6 last:pb-0">
+              <span aria-hidden="true" className="absolute -left-1.5 top-1 size-3 rounded-full border-2 border-surface bg-primary" />
               <StatusBadge status={entry.status as RepairStatus} />
               <span className="text-muted-foreground">
                 {formatDateTime(entry.created_at)} · {entry.employee_name}

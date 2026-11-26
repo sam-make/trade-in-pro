@@ -151,11 +151,11 @@ function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-ink md:text-3xl">
-          Bonjour {workspace?.profile.full_name?.split(" ")[0] ?? ""}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Voici l'activité de votre boutique.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-ink md:text-3xl">Tableau de bord</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Bonjour {workspace?.profile.full_name?.split(" ")[0] ?? ""}</p>
+        </div>
       </div>
 
       <ScanSearch />
@@ -164,33 +164,34 @@ function DashboardPage() {
         role="tablist"
         aria-label="Vues du tableau de bord"
         onKeyDown={onTabKey}
-        className="relative grid w-full grid-cols-2 rounded-xl border border-border bg-muted p-1 sm:w-80"
+        className="relative grid w-full grid-cols-2 border-b border-border sm:w-80"
       >
         <span
           aria-hidden
-          className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-lg bg-card shadow-sm transition-transform duration-300"
+          className="absolute bottom-0 left-0 h-0.5 w-1/2 bg-primary transition-transform duration-300"
           style={{ transform: view === "estimations" ? "translateX(100%)" : "translateX(0)" }}
         />
         {VIEWS.map((v, i) => (
-          <button
+          <Button
             key={v.id}
             ref={(el) => {
               tabRefs.current[i] = el;
             }}
             role="tab"
+            variant="ghost"
             id={`tab-${v.id}`}
             aria-selected={view === v.id}
             aria-controls={`panel-${v.id}`}
             tabIndex={view === v.id ? 0 : -1}
             onClick={() => goTo(v.id)}
             className={cn(
-              "relative z-10 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              view === v.id ? "text-ink" : "text-muted-foreground hover:text-ink",
+              "relative z-10 min-h-12 rounded-none px-3 py-2 text-sm font-medium",
+              view === v.id ? "text-primary" : "text-muted-foreground hover:text-ink",
             )}
           >
             <v.icon className="size-4" />
             {v.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -259,7 +260,7 @@ function StatCard({
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </>
   );
-  const cls = "surface-card block p-5";
+  const cls = "block h-full border-l border-border py-3 pl-4";
   return to ? (
     <Link to={to} className={cn(cls, "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
       {body}
@@ -282,7 +283,7 @@ function StatsGrid({
   }[];
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-y-4 border-y border-border py-4 lg:grid-cols-4">
       {stats.map((stat, i) => (
         <FadeUp key={stat.label} delay={i * 80}>
           <StatCard {...stat} />
@@ -330,8 +331,8 @@ function ListCard({
   children: ReactNode;
 }) {
   return (
-    <div className="surface-card overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border px-5 py-4">
+    <div className="overflow-hidden border-t border-border">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-4">
         <h2 className="text-base font-semibold text-ink">{title}</h2>
         <Link to={link} className="flex items-center gap-1 text-sm text-primary hover:underline">
           {linkLabel} <ArrowUpRight className="size-3.5" />

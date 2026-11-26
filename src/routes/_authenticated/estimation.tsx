@@ -139,7 +139,7 @@ function EstimationPage() {
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="mx-auto grid max-w-6xl gap-6 pb-24 lg:grid-cols-[1fr_340px] lg:pb-0">
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-ink md:text-3xl">Nouvelle estimation</h1>
@@ -149,68 +149,48 @@ function EstimationPage() {
         </div>
 
         <section className="surface-card p-6">
-          <h2 className="text-base font-semibold text-ink">Informations générales</h2>
+          <h2 className="flex items-center gap-3 text-base font-semibold text-ink"><span className="grid size-7 place-items-center rounded-full bg-accent text-sm text-primary">1</span>Appareil</h2>
           <div className="mt-5 space-y-5">
             <div className="space-y-2">
-              <Label>Modèle</Label>
-              <div className="flex flex-wrap gap-2">
+              <Label htmlFor="estimation-model">Modèle</Label>
+              <select id="estimation-model" className="field-select" value={modelId} onChange={(event) => pickModel(event.target.value)}>
+                <option value="">Choisir un iPhone</option>
                 {models.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => pickModel(item.id)}
-                    className={cn(
-                      "rounded-full border px-3.5 py-1.5 text-sm transition-all duration-200",
-                      item.id === modelId
-                        ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-xs)]"
-                        : "border-border bg-surface text-muted-foreground hover:border-primary/40 hover:text-foreground",
-                    )}
-                  >
-                    {item.name}
-                  </button>
+                  <option key={item.id} value={item.id}>{item.name}</option>
                 ))}
-              </div>
+              </select>
             </div>
 
             {model && (
               <>
                 <div className="space-y-2">
-                  <Label>Couleur</Label>
-                  <div className="flex flex-wrap gap-2">
+                  <Label htmlFor="estimation-color">Couleur</Label>
+                  <select id="estimation-color" className="field-select" value={color} onChange={(event) => setColor(event.target.value)}>
+                    <option value="">Choisir une couleur</option>
                     {model.colors.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => setColor(item)}
-                        className={cn(
-                          "rounded-full border px-3.5 py-1.5 text-sm transition-all duration-200",
-                          item === color
-                            ? "border-primary bg-accent text-accent-foreground"
-                            : "border-border bg-surface text-muted-foreground hover:text-foreground",
-                        )}
-                      >
-                        {item}
-                      </button>
+                      <option key={item} value={item}>{item}</option>
                     ))}
-                  </div>
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label>Stockage</Label>
                   <div className="flex flex-wrap gap-2">
                     {model.storages.map((item) => (
-                      <button
+                      <Button
                         key={item}
                         type="button"
+                        variant="outline"
+                        aria-pressed={item === storage}
                         onClick={() => setStorage(item)}
                         className={cn(
-                          "rounded-full border px-3.5 py-1.5 text-sm transition-all duration-200",
+                          "min-w-20 px-3.5 text-sm",
                           item === storage
                             ? "border-primary bg-accent text-accent-foreground"
                             : "border-border bg-surface text-muted-foreground hover:text-foreground",
                         )}
                       >
                         {formatStorage(item)}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -245,12 +225,12 @@ function EstimationPage() {
                 <label
                   key={rule.id}
                   className={cn(
-                    "flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors",
+                    "flex cursor-pointer items-center justify-between gap-3 rounded-md border px-4 py-3 transition-colors",
                     selected[rule.id] ? "border-primary/50 bg-accent" : "border-border bg-surface",
                   )}
                 >
                   <span className="text-sm text-foreground">{rule.name}</span>
-                  <span className="flex items-center gap-3">
+                  <span className="flex shrink-0 items-center gap-3">
                     <span className="text-xs text-muted-foreground">
                       {rule.is_blocking ? "Blocage" : `−${formatEuro(Number(rule.deduction))}`}
                     </span>
@@ -269,11 +249,11 @@ function EstimationPage() {
       </div>
 
       <aside className="lg:sticky lg:top-24 lg:h-fit">
-        <div className="surface-card p-6">
+        <div className="rounded-lg border border-border bg-accent/40 p-5 sm:p-6">
           <p className="text-sm text-muted-foreground">Prix de reprise proposé</p>
           <p
             className={cn(
-              "mt-2 font-[family-name:var(--font-display)] text-5xl font-semibold tracking-tight transition-all",
+              "mt-2 break-words font-[family-name:var(--font-display)] text-4xl font-semibold transition-all",
               breakdown.isBlocked ? "text-destructive" : "text-ink",
             )}
           >
@@ -322,6 +302,13 @@ function EstimationPage() {
           )}
         </div>
       </aside>
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 border-t border-border bg-accent px-4 py-3 lg:hidden">
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground">Offre de reprise</p>
+          <p className={cn("break-words text-xl font-semibold", breakdown.isBlocked ? "text-destructive" : "text-ink")}>{breakdown.isBlocked ? "Bloqué" : formatEuro(breakdown.finalPrice)}</p>
+        </div>
+        <Button disabled={!ready || mutation.isPending} onClick={() => mutation.mutate()}><Check />{mutation.isPending ? "Enregistrement…" : "Enregistrer"}</Button>
+      </div>
     </div>
   );
 }

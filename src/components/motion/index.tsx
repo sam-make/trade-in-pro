@@ -152,7 +152,7 @@ export function CountUp({
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   return (
-    <div key={pathname} className="animate-fade-up">
+    <div key={pathname} className="animate-page">
       {children}
     </div>
   );

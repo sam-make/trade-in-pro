@@ -97,3 +97,9 @@ La temporisation du smoke HTTP corrige une condition de concurrence possible ; e
 - `capture_shop_activity` et `guard_member_access` retournent trigger et sont utilisées par **4** et **2** triggers respectivement ; EXECUTE anon encore accordé. Candidats à une restriction ciblée après test transactionnel des triggers et revue des privilèges hérités PUBLIC. Les quatre autres fonctions exposées sans dépendance directe de policy/trigger doivent être examinées pour appels RPC et dépendances indirectes.
 - Worker Cloudflare de base : deux bindings publics présents, clé serveur absente ; Preview spécifique non inspectée aujourd'hui.
 - GO/NO-GO : **NO-GO**. Auth historique, JWT réels, écritures métier, delta Lovable final et rollback NON VÉRIFIÉS. Aucun SQL appliqué ni changement Lovable/production.
+
+
+## Contrôle sécurité du 26 novembre 2026
+- SELECT pg_proc/aclexplode/pg_trigger sur Supabase cible : les deux fonctions trigger capture_shop_activity et guard_member_access n'accordent pas EXECUTE à PUBLIC, mais anon et authenticated disposent du privilège effectif ; 4 et 2 triggers existants.
+- Brouillon non appliqué : [restriction ciblée](sql/20261126_trigger_execute_draft.sql). Revue et tests isolés des triggers, écritures métier, héritages et rollback obligatoires avant application.
+- GO/NO-GO : sécurité PARTIEL/NO-GO ; Auth réelle, JWT multi-boutiques, métier, delta Lovable et rollback NON VÉRIFIÉS. Aucun changement SQL ou production.

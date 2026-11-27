@@ -87,11 +87,12 @@
   --google-border: #747775;
   --radius: 0.5rem;
   --overlay: oklch(0.2 0.015 240 / 0.55);
-  --background: oklch(0.982 0.003 240);
+  --background: oklch(0.965 0.006 245);
   --foreground: oklch(0.19 0.015 260);
   --ink: oklch(0.27 0.025 240);
   --surface: oklch(1 0 0);
   --surface-2: oklch(0.976 0.005 240);
+  --shadow-panel: 0 1px 2px oklch(0.4 0.03 250 / 6%), 0 12px 32px -12px oklch(0.4 0.05 250 / 14%);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.19 0.015 260);
   --popover: oklch(1 0 0);
@@ -150,6 +151,7 @@
   --ink: oklch(0.97 0.004 250);
   --surface: oklch(0.22 0.008 260);
   --surface-2: oklch(0.185 0.006 260);
+  --shadow-panel: 0 12px 32px -12px oklch(0 0 0 / 50%);
   --card: var(--surface);
   --card-foreground: oklch(0.984 0.003 247.858);
   --popover: var(--surface);

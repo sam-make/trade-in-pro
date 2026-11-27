@@ -12,7 +12,6 @@ import {
   RefreshCw,
   Smartphone,
   Sparkles,
-  UserPlus,
   Users,
   Wrench,
 } from "lucide-react";
@@ -156,6 +155,11 @@ function DashboardPage() {
           <h1 className="text-2xl font-semibold text-ink md:text-3xl">Tableau de bord</h1>
           <p className="mt-1 text-sm text-muted-foreground">Bonjour {workspace?.profile.full_name?.split(" ")[0] ?? ""}</p>
         </div>
+        <Button asChild>
+          <Link to={view === "repairs" ? "/reparations/nouvelle" : "/estimation"}>
+            <Plus className="size-4" /> {view === "repairs" ? "Réparation" : "Estimation"}
+          </Link>
+        </Button>
       </div>
 
       <ScanSearch />
@@ -248,19 +252,17 @@ function StatCard({
 }) {
   const body = (
     <>
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-4" />
-        </span>
-      </div>
-      <p className="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold text-ink md:text-3xl">
+      <span className="flex items-center gap-2 text-sm font-medium text-ink">
+        <Icon className="size-4 text-muted-foreground" aria-hidden />
+        {label}
+      </span>
+      <p className="mt-3 font-[family-name:var(--font-display)] text-3xl font-semibold text-ink md:text-4xl">
         <CountUp value={value} format={format} />
       </p>
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </>
   );
-  const cls = "block h-full border-l border-border py-3 pl-4";
+  const cls = "block h-full border-l border-border py-1 pl-5";
   return to ? (
     <Link to={to} className={cn(cls, "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
       {body}
@@ -283,7 +285,7 @@ function StatsGrid({
   }[];
 }) {
   return (
-    <div className="grid grid-cols-2 gap-y-4 border-y border-border py-4 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-y-5 border-b border-border pb-6 lg:grid-cols-4 [&>*:nth-child(odd)>*]:max-lg:border-l-0 [&>*:nth-child(odd)>*]:max-lg:pl-0 [&>*:first-child>*]:border-l-0 [&>*:first-child>*]:pl-0">
       {stats.map((stat, i) => (
         <FadeUp key={stat.label} delay={i * 80}>
           <StatCard {...stat} />
@@ -331,9 +333,9 @@ function ListCard({
   children: ReactNode;
 }) {
   return (
-    <div className="overflow-hidden border-t border-border">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border py-4">
-        <h2 className="text-base font-semibold text-ink">{title}</h2>
+    <div className="overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-4">
+        <h2 className="text-lg font-semibold text-ink">{title}</h2>
         <Link to={link} className="flex items-center gap-1 text-sm text-primary hover:underline">
           {linkLabel} <ArrowUpRight className="size-3.5" />
         </Link>
@@ -393,20 +395,7 @@ function RepairsView({ shopId }: { shopId?: string }) {
   const loading = !shopId || query.isLoading;
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
-        <Button asChild>
-          <Link to="/reparations/nouvelle">
-            <Plus className="size-4" /> Nouvelle réparation
-          </Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link to="/clients">
-            <UserPlus className="size-4" /> Nouveau client
-          </Link>
-        </Button>
-      </div>
-
+    <div className="space-y-8 pt-2">
       {query.isError ? (
         <ErrorState onRetry={() => query.refetch()} />
       ) : loading || !data ? (
@@ -434,41 +423,31 @@ function RepairsView({ shopId }: { shopId?: string }) {
             ) : null
           }
         >
-          <ul className="divide-y divide-border">
-            {data?.recent.map((row, i) => (
-              <li
-                key={row.id}
-                className="animate-fade-up"
-                style={{ "--motion-delay": `${i * 60}ms` } as React.CSSProperties}
-              >
-                <Link
-                  to="/reparations/$id"
-                  params={{ id: row.id }}
-                  className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-muted/50"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                      <Smartphone className="size-4" />
+          <div className="overflow-hidden rounded-lg border border-border">
+            <div className="hidden grid-cols-[1.1fr_1.4fr_1fr_auto] gap-4 bg-surface-2 px-4 py-3 text-xs font-medium text-muted-foreground md:grid">
+              <span>Dossier</span><span>Appareil</span><span>Statut</span><span className="w-20 text-right">Montant</span>
+            </div>
+            <ul className="divide-y divide-border">
+              {data?.recent.map((row, i) => (
+                <li key={row.id} className="animate-fade-up" style={{ "--motion-delay": `${i * 60}ms` } as CSSProperties}>
+                  <Link
+                    to="/reparations/$id"
+                    params={{ id: row.id }}
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-4 transition-colors hover:bg-muted/50 md:grid-cols-[1.1fr_1.4fr_1fr_auto]"
+                  >
+                    <span className="min-w-0 truncate text-sm font-medium text-ink">{row.reference}</span>
+                    <span className="min-w-0 truncate text-sm text-ink max-md:order-3 max-md:text-xs max-md:text-muted-foreground">
+                      {row.brand} {row.model} · <span className="text-muted-foreground">{customerName(row.customers)}</span>
                     </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-ink">
-                        {row.brand} {row.model}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {row.reference} · {customerName(row.customers)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={row.status} />
-                    <span className="font-[family-name:var(--font-display)] text-base font-semibold text-ink">
+                    <span className="max-md:order-2 max-md:justify-self-end"><StatusBadge status={row.status} /></span>
+                    <span className="w-20 text-right font-[family-name:var(--font-display)] text-sm font-semibold text-ink max-md:order-4 max-md:justify-self-end">
                       {formatEuro(Number(row.total_price))}
                     </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </ListCard>
       )}
     </div>
@@ -520,20 +499,7 @@ function EstimationsView({ shopId }: { shopId?: string }) {
   const loading = !shopId || query.isLoading;
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
-        <Button asChild>
-          <Link to="/estimation">
-            <Sparkles className="size-4" /> Nouvelle estimation
-          </Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link to="/historique">
-            <CalendarDays className="size-4" /> Historique complet
-          </Link>
-        </Button>
-      </div>
-
+    <div className="space-y-8 pt-2">
       {query.isError ? (
         <ErrorState onRetry={() => query.refetch()} />
       ) : loading || !data ? (
@@ -561,7 +527,7 @@ function EstimationsView({ shopId }: { shopId?: string }) {
             ) : null
           }
         >
-          <ul className="divide-y divide-border">
+          <ul className="divide-y divide-border rounded-lg border border-border">
             {data?.recent.map((row, i) => (
               <li
                 key={row.id}

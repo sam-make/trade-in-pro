@@ -85,16 +85,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="flex min-h-dvh w-full bg-surface">
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
+    <div className="min-h-dvh w-full bg-background lg:p-5">
+    <div className="flex min-h-dvh w-full bg-surface lg:min-h-[calc(100dvh-2.5rem)] lg:overflow-clip lg:rounded-2xl lg:border lg:border-border lg:shadow-[var(--shadow-panel)]">
+      <aside className="sticky top-0 hidden h-[calc(100dvh-2.5rem)] w-60 shrink-0 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
         <Link to="/tableau-de-bord" className="px-2">
           <Logo />
         </Link>
         <div className="mt-8 flex-1">{nav}</div>
         <div className="border-t border-border px-2 pt-5">
-          <Store className="mb-2 size-4 text-muted-foreground" />
-          <p className="truncate text-sm font-medium text-ink">{workspace?.shop.name ?? "…"}</p>
-          <p className="truncate text-xs text-muted-foreground">{workspace?.profile.full_name}</p>
+          <div className="flex items-center gap-3">
+            <Store className="size-5 shrink-0 text-muted-foreground" />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-ink">{workspace?.shop.name ?? "…"}</p>
+              <p className="truncate text-xs text-muted-foreground">{workspace?.profile.full_name}</p>
+            </div>
+          </div>
           <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
             <LogOut className="size-4" />
             Déconnexion
@@ -106,11 +111,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-surface/95 px-4 backdrop-blur-xl lg:px-8">
           <div className="flex items-center gap-3">
             <Link to="/tableau-de-bord" className="lg:hidden"><Logo /></Link>
-            <span className="hidden text-sm font-medium text-muted-foreground lg:block">
-              {workspace?.shop.name ?? "Chargement…"}
+            <span className="hidden text-sm font-medium text-muted-foreground first-letter:uppercase lg:block">
+              {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
             </span>
           </div>
-          <div className="hidden lg:flex"><ThemeControls /></div>
+          <div className="hidden items-center gap-3 lg:flex">
+            <ThemeControls />
+            <span className="flex size-10 items-center justify-center rounded-full border border-border bg-accent text-sm font-semibold text-primary" title={workspace?.profile.full_name ?? undefined} aria-hidden>
+              {(workspace?.profile.full_name ?? "?").trim().charAt(0).toUpperCase()}
+            </span>
+          </div>
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen((value) => !value)} aria-label={open ? "Fermer le menu" : "Menu"} aria-expanded={open} aria-controls="mobile-workshop-menu">
             {open ? <X /> : <Menu />}
           </Button>
@@ -153,6 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         })}
         <Button variant="ghost" className={cn("min-h-16 flex-col gap-1 rounded-none text-[11px] font-medium", open || ["/clients", "/historique", "/administration", "/admin"].some((path) => pathname.startsWith(path)) ? "text-primary" : "text-muted-foreground")} onClick={() => setOpen((value) => !value)} aria-label="Plus de rubriques" aria-expanded={open} aria-controls="mobile-workshop-menu"><MoreHorizontal className="size-5" />Plus</Button>
       </nav>
+    </div>
     </div>
   );
 }

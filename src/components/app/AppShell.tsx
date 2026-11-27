@@ -66,13 +66,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-current={active ? "page" : undefined}
             onClick={() => setOpen(false)}
             className={cn(
-              "flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-200",
+              "flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200",
               active
-                ? "bg-accent text-primary"
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
             )}
           >
-            <item.icon className={cn("size-4", active && "text-primary")} />
+            <item.icon className="size-4" />
             {item.label}
             {"adminOnly" in item && item.adminOnly && workspaceLoading && (
               <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" aria-label="Chargement du rôle" />

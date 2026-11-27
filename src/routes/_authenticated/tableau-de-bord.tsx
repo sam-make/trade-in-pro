@@ -242,6 +242,7 @@ function StatCard({
   icon: Icon,
   to,
   hint,
+  tone,
 }: {
   label: string;
   value: number;
@@ -249,20 +250,28 @@ function StatCard({
   icon: typeof Wrench;
   to?: "/reparations" | "/clients" | "/historique";
   hint?: string;
+  tone?: number;
 }) {
+  const tones = [
+    "bg-tile-1 text-tile-1-foreground",
+    "bg-tile-2 text-tile-2-foreground",
+    "bg-tile-3 text-tile-3-foreground",
+    "bg-tile-4 text-tile-4-foreground",
+  ];
+  const toneCls = tones[(tone ?? 0) % 4] ?? tones[0];
   const body = (
     <>
-      <span className="flex items-center gap-2 text-sm font-medium text-ink">
-        <Icon className="size-4 text-muted-foreground" aria-hidden />
+      <span className="flex items-center justify-between gap-2 text-sm font-semibold">
         {label}
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-surface/70"><Icon className="size-4" aria-hidden /></span>
       </span>
-      <p className="mt-3 font-[family-name:var(--font-display)] text-3xl font-semibold text-ink md:text-4xl">
+      <p className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold md:text-4xl">
         <CountUp value={value} format={format} />
       </p>
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-1 text-xs opacity-80">{hint}</p>}
     </>
   );
-  const cls = "block h-full border-l border-border py-1 pl-5";
+  const cls = cn("block h-full rounded-2xl p-5 transition-transform hover:-translate-y-0.5", toneCls);
   return to ? (
     <Link to={to} className={cn(cls, "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
       {body}
@@ -285,10 +294,10 @@ function StatsGrid({
   }[];
 }) {
   return (
-    <div className="grid grid-cols-2 gap-y-5 border-b border-border pb-6 lg:grid-cols-4 [&>*:nth-child(odd)>*]:max-lg:border-l-0 [&>*:nth-child(odd)>*]:max-lg:pl-0 [&>*:first-child>*]:border-l-0 [&>*:first-child>*]:pl-0">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
       {stats.map((stat, i) => (
         <FadeUp key={stat.label} delay={i * 80}>
-          <StatCard {...stat} />
+          <StatCard {...stat} tone={i} />
         </FadeUp>
       ))}
     </div>

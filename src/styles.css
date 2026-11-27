@@ -72,6 +72,14 @@
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-ink: var(--ink);
+  --color-tile-1: var(--tile-1);
+  --color-tile-1-foreground: var(--tile-1-foreground);
+  --color-tile-2: var(--tile-2);
+  --color-tile-2-foreground: var(--tile-2-foreground);
+  --color-tile-3: var(--tile-3);
+  --color-tile-3-foreground: var(--tile-3-foreground);
+  --color-tile-4: var(--tile-4);
+  --color-tile-4-foreground: var(--tile-4-foreground);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-google-background: var(--google-background);
@@ -87,7 +95,7 @@
   --google-border: #747775;
   --radius: 0.5rem;
   --overlay: oklch(0.2 0.015 240 / 0.55);
-  --background: oklch(0.965 0.006 245);
+  --background: oklch(0.96 0.015 255);
   --foreground: oklch(0.19 0.015 260);
   --ink: oklch(0.27 0.025 240);
   --surface: oklch(1 0 0);
@@ -97,7 +105,7 @@
   --card-foreground: oklch(0.19 0.015 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.19 0.015 260);
-  --primary: oklch(0.57 0.15 245);
+  --primary: oklch(0.55 0.2 260);
   --primary-foreground: oklch(0.99 0.005 250);
   --secondary: oklch(0.965 0.006 255);
   --secondary-foreground: oklch(0.24 0.02 262);
@@ -120,6 +128,14 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: var(--surface);
+  --tile-1: oklch(0.94 0.045 250);
+  --tile-1-foreground: oklch(0.42 0.17 260);
+  --tile-2: oklch(0.95 0.05 155);
+  --tile-2-foreground: oklch(0.42 0.12 155);
+  --tile-3: oklch(0.96 0.06 80);
+  --tile-3-foreground: oklch(0.48 0.12 60);
+  --tile-4: oklch(0.94 0.045 300);
+  --tile-4-foreground: oklch(0.45 0.16 300);
   --sidebar-foreground: oklch(0.129 0.042 264.695);
   --sidebar-primary: oklch(0.208 0.042 265.755);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
@@ -182,6 +198,14 @@
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: var(--surface-2);
+  --tile-1: oklch(0.3 0.07 255);
+  --tile-1-foreground: oklch(0.85 0.1 250);
+  --tile-2: oklch(0.3 0.06 155);
+  --tile-2-foreground: oklch(0.85 0.12 155);
+  --tile-3: oklch(0.32 0.06 70);
+  --tile-3-foreground: oklch(0.88 0.12 80);
+  --tile-4: oklch(0.3 0.07 300);
+  --tile-4-foreground: oklch(0.85 0.1 300);
   --sidebar-foreground: oklch(0.984 0.003 247.858);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
@@ -256,8 +280,9 @@
 .workshop-main section.surface-card,
 .workshop-main header.surface-card {
   border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 4px);
+  border-radius: calc(var(--radius) + 8px);
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 .workshop-main select {
   appearance: none;

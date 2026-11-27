@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,14 +95,14 @@ function RepairsPage() {
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
         {(["all", ...REPAIR_STATUSES] as const).map((value) => (
           <button
             key={value}
             type="button"
             onClick={() => setStatus(value)}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+              "shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
               status === value
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:bg-surface-2",
@@ -119,31 +119,32 @@ function RepairsPage() {
         ) : filtered.length === 0 ? (
           <p className="px-6 py-10 text-center text-sm text-muted-foreground">Aucun dossier ne correspond.</p>
         ) : (
-          <ul className="divide-y divide-border">
-            {filtered.map((repair, i) => (
-              <li
-                key={repair.id}
-                className="animate-fade-up"
-                style={{ "--motion-delay": `${Math.min(i, 10) * 50}ms` } as CSSProperties}
-              >
-                <Link
-                  to="/reparations/$id"
-                  params={{ id: repair.id }}
-                  className="flex flex-wrap items-center gap-3 px-6 py-4 transition-colors hover:bg-surface-2"
-                >
-                  <span className="text-sm font-medium text-ink">{repair.reference}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {customerName(repair.customers)} · {repair.brand} {repair.model}
-                  </span>
-                  <StatusBadge status={repair.status} />
-                  <span className="ml-auto text-sm font-medium text-ink">{formatEuro(Number(repair.total_price))}</span>
-                  <span className="w-full text-xs text-muted-foreground">
-                    {formatDateTime(repair.created_at)} · {repair.employee_name}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className="hidden grid-cols-[9rem_minmax(0,1fr)_minmax(0,1fr)_10rem_6rem] gap-4 border-b border-border bg-surface-2 px-5 py-3 text-xs font-medium text-muted-foreground md:grid">
+              <span>Dossier</span><span>Client</span><span>Appareil</span><span>Statut</span><span className="text-right">Montant</span>
+            </div>
+            <ul className="divide-y divide-border">
+              {filtered.map((repair) => (
+                <li key={repair.id}>
+                  <Link
+                    to="/reparations/$id"
+                    params={{ id: repair.id }}
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-5 py-4 transition-colors hover:bg-surface-2 md:grid-cols-[9rem_minmax(0,1fr)_minmax(0,1fr)_10rem_6rem]"
+                  >
+                    <span className="text-sm font-medium text-ink">{repair.reference}</span>
+                    <span className="hidden min-w-0 md:block">
+                      <span className="block truncate text-sm text-ink">{customerName(repair.customers)}</span>
+                      <span className="block truncate text-xs text-muted-foreground">{formatDateTime(repair.created_at)}</span>
+                    </span>
+                    <span className="hidden truncate text-sm text-muted-foreground md:block">{repair.brand} {repair.model}</span>
+                    <span className="justify-self-end md:justify-self-start"><StatusBadge status={repair.status} /></span>
+                    <span className="truncate text-xs text-muted-foreground md:hidden">{customerName(repair.customers)} · {repair.brand} {repair.model}</span>
+                    <span className="text-right text-sm font-medium text-ink">{formatEuro(Number(repair.total_price))}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
     </div>

@@ -357,3 +357,9 @@ Détails, portée réelle et preuves : [docs/AUDIT_PREPROD_2026-11-23.md](docs/A
 - SELECT pg_proc/aclexplode/pg_trigger sur Supabase cible : les deux fonctions trigger capture_shop_activity et guard_member_access n'accordent pas EXECUTE à PUBLIC, mais anon et authenticated disposent du privilège effectif ; 4 et 2 triggers existants.
 - Brouillon non appliqué : [restriction ciblée](docs/sql/20261126_trigger_execute_draft.sql). Chemin : docs/sql/20261126_trigger_execute_draft.sql. Revue et tests isolés des triggers, écritures métier, héritages et rollback obligatoires avant application.
 - GO/NO-GO : sécurité PARTIEL/NO-GO ; Auth réelle, JWT multi-boutiques, métier, delta Lovable et rollback NON VÉRIFIÉS. Aucun changement SQL ou production.
+
+
+## Contrôle du 27 novembre 2026
+- PR #1 : brouillon ouvert, tête `400e234b693a8573a936e9b33f77c53120a952d6`, base `54b3a729d25e8766c5b855bf67482cc1ebd915ad`. API GitHub : `mergeable=false` ; cause exacte à diagnostiquer sans fusion ni rebase automatique. Aucun run déclenché par PR retourné pour cette tête (API limitée aux runs PR).
+- Supabase cible : SELECT agrégé confirmé, 24 tables publiques et 24 RLS activées. Ne prouve pas l'isolation JWT.
+- NO-GO : Auth réelle, JWT, métier, delta source/cible et rollback non vérifiés ; Cloudflare accessible par connecteur mais Worker/Preview non inspectés ce jour. Six sous-agents non exécutés ; cinq revues complètes non vérifiées. Aucun SQL appliqué, aucune production modifiée.
